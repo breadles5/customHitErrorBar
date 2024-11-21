@@ -18,24 +18,53 @@ let localHitErrors = [];
 let lastHitErrorCount = 0;
 let mods = [];
 
+// Store timeouts for cleanup
+const timeouts = new Set();
+
+// Helper function to create managed timeout
+const createTimeout = (callback, delay) => {
+    const timeoutId = setTimeout(() => {
+        callback();
+        timeouts.delete(timeoutId);
+    }, delay);
+    timeouts.add(timeoutId);
+    return timeoutId;
+};
+
+// Cleanup function
+const cleanup = () => {
+    // Clear all timeouts
+    timeouts.forEach(id => clearTimeout(id));
+    timeouts.clear();
+    
+    // Reset state
+    localHitErrors = [];
+    lastHitErrorCount = 0;
+    
+    // Clear existing ticks
+    if (elements.tickContainer) {
+        elements.tickContainer.innerHTML = '';
+    }
+};
+
+// Reset function with cleanup
 const reset = () => {
     lastHitErrorCount = 0;
     localHitErrors = [];
+    
     // Reset standard deviation display
     if (elements.sd) {
         elements.sd.textContent = '0.00';
     }
+    
     // Reset arrow position
     if (elements.arrow) {
         elements.arrow.style.transform = 'translateX(0px)';
-        elements.arrow.style.color = 'var(--arrow-perfect)';
+        elements.arrow.style.borderTopColor = 'var(--arrow-perfect)';
     }
-    // Clear existing ticks
-    const tickContainer = document.querySelector('.tick-container');
-    if (tickContainer) {
-        const ticks = tickContainer.querySelectorAll('.tick');
-        ticks.forEach(tick => tick.remove());
-    }
+    
+    // Clear existing ticks with cleanup
+    cleanup();
 };
 
 // Initialize WebSocket connection
@@ -153,3 +182,6 @@ socket.api_v2_precise((data) => {
         console.error('[MESSAGE_ERROR] Error processing WebSocket message:', error);
     }
 });
+
+// Cleanup on page unload
+window.addEventListener('unload', cleanup);

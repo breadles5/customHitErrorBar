@@ -41,6 +41,7 @@ html {
     padding: 0;
     overflow: hidden;
     background: rgba(0, 0, 0, 0);
+    contain: layout style paint;
 }
 
 .main {
@@ -48,6 +49,8 @@ html {
     flex-direction: column;
     align-items: center;
     width: var(--container-width);
+    contain: layout style;
+    will-change: transform;
 }
 
 .sd {
@@ -56,6 +59,8 @@ html {
     color: #ffffffaa;
     transition: linear 200ms;
     width: var(--container-width);
+    contain: content;
+    will-change: contents;
 }
 
 /*arrow*/
@@ -64,6 +69,7 @@ html {
     justify-content: center;
     width: var(--container-width);
     height: var(--arrow-size);
+    contain: layout size;
 }
 
 .arrow {
@@ -73,6 +79,8 @@ html {
     border-left: calc(var(--arrow-size) * 0.667) solid transparent;
     border-right: calc(var(--arrow-size) * 0.667) solid transparent;
     border-top: var(--arrow-size) solid var(--arrow-perfect);
+    transform: translateZ(0);
+    will-change: transform, border-top-color;
 }
 
 .colors-container,
@@ -83,10 +91,13 @@ html {
     justify-content: center;
     height: var(--bar-height);
     width: var(--container-width);
+    contain: layout paint style;
+    will-change: transform;
 }
 
 .colors-container {
     opacity: var(--timing-windows-opacity);
+    contain: layout paint style;
 }
 
 .colors-container>div {
@@ -94,6 +105,8 @@ html {
     height: calc(var(--timing-window-height) * 1%);
     transition: linear 200ms;
     border-radius: var(--timing-window-radius);
+    contain: layout paint;
+    will-change: width;
 }
 
 /* Timing window colors */
@@ -137,6 +150,10 @@ html {
     opacity: 1;
     transition: opacity var(--fade-out-duration) linear;
     z-index: 7;
+    transform: translateZ(0);
+    will-change: transform, opacity;
+    contain: layout paint style;
+    backface-visibility: hidden;
 }
 
 .tick.fade-out {
@@ -175,9 +192,11 @@ html {
     background-color: var(--bar-color);
     border-radius: var(--bar-radius);
     z-index: 8;
+    contain: layout paint style;
 }
 
 .hidden {
     opacity: 0 !important;
     pointer-events: none;
+    visibility: hidden;
 }

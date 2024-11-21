@@ -2,11 +2,40 @@ import { settings } from './settings.js';
 import { elements } from './elements.js';
 import { calculateTimingWindowsForGamemode } from './timingWindows.js';
 
+// Object pool for tick elements
+const tickPool = {
+    pool: [],
+    maxSize: 50, // Match localHitErrors max size
+
+    get() {
+        if (this.pool.length > 0) {
+            return this.pool.pop();
+        }
+        const tick = document.createElement('div');
+        tick.className = 'tick';
+        return tick;
+    },
+
+    release(tick) {
+        if (this.pool.length < this.maxSize) {
+            // Reset tick state
+            tick.className = 'tick';
+            tick.style.transform = '';
+            this.pool.push(tick);
+        } else {
+            tick.remove();
+        }
+    }
+};
+
 export const createTick = (hitError, gamemode, od, mods) => {
     const timingWindows = calculateTimingWindowsForGamemode(gamemode, od, mods);
     const hitErrorAbs = Math.abs(hitError);
     
-    const tick = document.createElement('div');
+    // Get tick from pool instead of creating new element
+    const tick = tickPool.get();
+    
+    // Reset any existing classes
     tick.className = 'tick';
 
     // Set color based on timing window and gamemode
@@ -53,10 +82,11 @@ export const createTick = (hitError, gamemode, od, mods) => {
             tick.classList.add('fade-out');
         }, settings.tickDuration);
 
-        // Remove tick after fade out completes
+        // Return tick to pool after fade out completes
         setTimeout(() => {
             if (tick.parentNode) {
-                tick.parentNode.removeChild(tick);
+                tick.classList.remove('fade-out');
+                tickPool.release(tick);
             }
         }, settings.tickDuration + settings.fadeOutDuration);
     }

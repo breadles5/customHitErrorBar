@@ -1,6 +1,33 @@
 fix:
 1. optimize lag (VERY LAGGY)
-finaliize:
+
+Performance Optimizations:
+
+1. DOM and Memory Optimizations
+   - [x] Implement object pooling for tick elements
+   - [x] Cache DOM element references
+   - [x] Limit maximum number of visible ticks
+   - [x] Clean up event listeners and timers
+
+2. CSS and Animation Optimizations
+   - [x] Add hardware acceleration for transforms
+   - [x] Optimize transitions and animations
+   - [x] Implement CSS containment
+   - [x] Reduce paint area and reflows
+
+3. State Management Optimizations
+   - [ ] Cache timing window calculations
+   - [ ] Use requestAnimationFrame for animations
+   - [ ] Debounce standard deviation calculations
+   - [ ] Optimize array operations
+
+4. Advanced Optimizations (if needed)
+   - [ ] Implement Web Workers for calculations
+   - [ ] Add virtual scrolling for ticks
+   - [ ] Profile and optimize memory usage
+   - [ ] Bundle optimization
+
+finalize:
 bundle everything into a single file
     find best way to bundle:
     vite?
