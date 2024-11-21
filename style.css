@@ -51,6 +51,8 @@ html {
     width: var(--container-width);
     contain: layout style;
     will-change: transform;
+    position: relative;
+    height: var(--bar-height);
 }
 
 .sd {

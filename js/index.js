@@ -43,7 +43,7 @@ const cleanup = () => {
     
     // Clear existing ticks
     if (elements.tickContainer) {
-        elements.tickContainer.innerHTML = '';
+        elements.tickContainer.innerHTML = '<div class=bar></div>';
     }
 };
 
