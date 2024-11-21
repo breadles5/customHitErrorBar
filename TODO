@@ -1,0 +1,8 @@
+fix:
+1. optimize lag (VERY LAGGY)
+finaliize:
+bundle everything into a single file
+    find best way to bundle:
+    vite?
+    webpack
+    rollup

@@ -1,0 +1,183 @@
+:root {
+    /* Base colors */
+    --color-300g: #ffffff;
+    --color-300: #ffff00;
+    --color-200: #00ff00;
+    --color-100: #00bfff;
+    --color-50: #8a2ce2;
+    --color-0: #ff0000;
+    
+    /* Arrow colors */
+    --arrow-early: #FF0000;
+    --arrow-late: #00AAFF;
+    --arrow-perfect: #FFF;
+
+    /* Bar settings */
+    --bar-color: #FFFFFF;
+    --bar-width: 10px;
+    --bar-height: 75px;
+    --bar-radius: 0px;
+
+    /* Sizes */
+    --tick-width: 10px;
+    --tick-height: 50px;
+    --container-width: 400px;
+    --arrow-size: 20px;
+    --tick-radius: 0px;
+
+    /* Theme */
+    --timing-windows-opacity: 0.33;
+    --timing-window-height: 100;
+    --timing-window-radius: 0px;
+    
+    /* Animation */
+    --tick-duration: 3000ms;
+    --fade-out-duration: 300ms;
+}
+
+body,
+html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0);
+}
+
+.main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: var(--container-width);
+}
+
+.sd {
+    text-align: center;
+    font: 2.5rem 'Helvetica', sans-serif, bold;
+    color: #ffffffaa;
+    transition: linear 200ms;
+    width: var(--container-width);
+}
+
+/*arrow*/
+.arrow-container {
+    display: flex;
+    justify-content: center;
+    width: var(--container-width);
+    height: var(--arrow-size);
+}
+
+.arrow {
+    transition: transform 200ms linear;
+    width: 0;
+    height: 0;
+    border-left: calc(var(--arrow-size) * 0.667) solid transparent;
+    border-right: calc(var(--arrow-size) * 0.667) solid transparent;
+    border-top: var(--arrow-size) solid var(--arrow-perfect);
+}
+
+.colors-container,
+.tick-container {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--bar-height);
+    width: var(--container-width);
+}
+
+.colors-container {
+    opacity: var(--timing-windows-opacity);
+}
+
+.colors-container>div {
+    position: absolute;
+    height: calc(var(--timing-window-height) * 1%);
+    transition: linear 200ms;
+    border-radius: var(--timing-window-radius);
+}
+
+/* Timing window colors */
+.timing-window-300g {
+    background-color: var(--color-300g);
+    z-index: 6;
+}
+
+.timing-window-300 {
+    background-color: var(--color-300);
+    z-index: 5;
+}
+
+.timing-window-200 {
+    background-color: var(--color-200);
+    z-index: 4;
+}
+
+.timing-window-100 {
+    background-color: var(--color-100);
+    z-index: 3;
+}
+
+.timing-window-50 {
+    background-color: var(--color-50);
+    z-index: 2;
+}
+
+.timing-window-0 {
+    background-color: var(--color-0);
+    max-width: 940px;
+    z-index: 1;
+}
+
+/* Tick styling */
+.tick {
+    height: var(--tick-height);
+    width: var(--tick-width);
+    border-radius: var(--tick-radius);
+    position: absolute;
+    opacity: 1;
+    transition: opacity var(--fade-out-duration) linear;
+    z-index: 7;
+}
+
+.tick.fade-out {
+    opacity: 0;
+}
+
+/* Timing window-based colors for ticks */
+.tick.marvelous {
+    background-color: var(--color-300g);
+}
+
+.tick.perfect {
+    background-color: var(--color-300);
+}
+
+.tick.great {
+    background-color: var(--color-200);
+}
+
+.tick.good {
+    background-color: var(--color-100);
+}
+
+.tick.bad {
+    background-color: var(--color-50);
+}
+
+.tick.miss {
+    background-color: var(--color-0);
+}
+
+.bar {
+    position: absolute;
+    width: var(--bar-width);
+    height: var(--bar-height);
+    background-color: var(--bar-color);
+    border-radius: var(--bar-radius);
+    z-index: 8;
+}
+
+.hidden {
+    opacity: 0 !important;
+    pointer-events: none;
+}
