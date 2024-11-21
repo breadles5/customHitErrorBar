@@ -1,6 +1,6 @@
 class WebSocketManager {
   constructor(host) {
-    this.version = '0.1.3';
+    this.version = "0.1.3";
 
     if (host) {
       this.host = host;
@@ -15,10 +15,12 @@ class WebSocketManager {
   }
 
   createConnection(url, callback, filters) {
-    let INTERVAL = '';
+    let INTERVAL = "";
 
     const that = this;
-    this.sockets[url] = new WebSocket(`ws://${this.host}${url}?l=${encodeURI(window.COUNTER_PATH)}`);
+    this.sockets[url] = new WebSocket(
+      `ws://${this.host}${url}?l=${encodeURI(window.COUNTER_PATH)}`,
+    );
 
     this.sockets[url].onopen = () => {
       console.log(`[OPEN] ${url}: Connected`);
@@ -42,29 +44,30 @@ class WebSocketManager {
       console.log(`[ERROR] ${url}: ${event.reason}`);
     };
 
-
     this.sockets[url].onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
         if (data.error != null) {
           console.error(`[MESSAGE_ERROR] ${url}:`, data.error);
           return;
-        };
+        }
 
         if (data.message != null) {
           if (data.message.error != null) {
             console.error(`[MESSAGE_ERROR] ${url}:`, data.message.error);
             return;
           }
-        };
+        }
 
         callback(data);
       } catch (error) {
-        console.log(`[MESSAGE_ERROR] ${url}: Couldn't parse incomming message`, error);
-      };
+        console.log(
+          `[MESSAGE_ERROR] ${url}: Couldn't parse incomming message`,
+          error,
+        );
+      }
     };
-  };
-
+  }
 
   /**
    * Connects to gosu compatible socket api.
@@ -73,8 +76,7 @@ class WebSocketManager {
    */
   api_v1(callback, filters) {
     this.createConnection(`/ws`, callback, filters);
-  };
-
+  }
 
   /**
    * Connects to tosu advanced socket api.
@@ -83,8 +85,7 @@ class WebSocketManager {
    */
   api_v2(callback, filters) {
     this.createConnection(`/websocket/v2`, callback, filters);
-  };
-
+  }
 
   /**
    * Connects to tosu precise socket api.
@@ -93,8 +94,7 @@ class WebSocketManager {
    */
   api_v2_precise(callback, filters) {
     this.createConnection(`/websocket/v2/precise`, callback, filters);
-  };
-
+  }
 
   /**
    * Calculate custom pp for a current, or specified map
@@ -103,19 +103,18 @@ class WebSocketManager {
    */
   async calculate_pp(params) {
     try {
-      if (typeof params != 'object') {
+      if (typeof params != "object") {
         return {
-          error: 'Wrong argument type, should be object with params'
+          error: "Wrong argument type, should be object with params",
         };
-      };
-
+      }
 
       const url = new URL(`http://${this.host}/api/calculate/pp`);
-      Object.keys(params)
-        .forEach(key => url.searchParams.append(key, params[key]));
+      Object.keys(params).forEach((key) =>
+        url.searchParams.append(key, params[key]),
+      );
 
-      const request = await fetch(url, { method: "GET", });
-
+      const request = await fetch(url, { method: "GET" });
 
       const json = await request.json();
       return json;
@@ -125,9 +124,8 @@ class WebSocketManager {
       return {
         error: error.message,
       };
-    };
-  };
-
+    }
+  }
 
   /**
    * Get beatmap **.osu** file (local)
@@ -136,17 +134,15 @@ class WebSocketManager {
    */
   async getBeatmapOsuFile(file_path) {
     try {
-      if (typeof file_path != 'object') {
+      if (typeof file_path != "object") {
         return {
-          error: 'Wrong argument type, should be object with params'
+          error: "Wrong argument type, should be object with params",
         };
-      };
-
+      }
 
       const request = await fetch(`${this.host}/files/beatmap/${file_path}`, {
         method: "GET",
       });
-
 
       const text = await request.text();
       return text;
@@ -156,9 +152,8 @@ class WebSocketManager {
       return {
         error: error.message,
       };
-    };
-  };
-
+    }
+  }
 
   /**
    * Connects to message
@@ -166,29 +161,28 @@ class WebSocketManager {
    */
   commands(callback) {
     this.createConnection(`/websocket/commands`, callback);
-  };
+  }
 
   /**
-   * 
-   * @param {string} name 
-   * @param {string|Object} payload 
+   *
+   * @param {string} name
+   * @param {string|Object} payload
    */
   sendCommand(name, command, amountOfRetries = 1) {
     const that = this;
 
-
-    if (!this.sockets['/websocket/commands']) {
+    if (!this.sockets["/websocket/commands"]) {
       setTimeout(() => {
         that.sendCommand(name, command, amountOfRetries + 1);
       }, 100);
 
       return;
-    };
-
+    }
 
     try {
-      const payload = typeof command == 'object' ? JSON.stringify(command) : command;
-      this.sockets['/websocket/commands'].send(`${name}:${payload}`);
+      const payload =
+        typeof command == "object" ? JSON.stringify(command) : command;
+      this.sockets["/websocket/commands"].send(`${name}:${payload}`);
     } catch (error) {
       if (amountOfRetries <= 3) {
         console.log(`[COMMAND_ERROR] Attempt ${amountOfRetries}`, error);
@@ -196,13 +190,11 @@ class WebSocketManager {
           that.sendCommand(name, command, amountOfRetries + 1);
         }, 1000);
         return;
-      };
-
+      }
 
       console.error(`[COMMAND_ERROR]`, error);
-    };
-  };
-
+    }
+  }
 
   close(url) {
     this.host = url;
@@ -214,19 +206,15 @@ class WebSocketManager {
 
       if (!value) continue;
       value.close();
-    };
-  };
-};
-
+    }
+  }
+}
 
 export default WebSocketManager;
 
-
-
-/** 
+/**
  * @typedef {string | { field: string; keys: Filters[] }} Filters
  */
-
 
 /** @typedef {object} CALCULATE_PP
  * @property {string} path Path to .osu file. Example: C:/osu/Songs/beatmap/file.osu
@@ -243,8 +231,6 @@ export default WebSocketManager;
  * @property {number} passedObjects Sum of nGeki, nKatu, n300, n100, n50, nMisses
  * @property {number} clockRate Map rate number. Example: 1.5 = DT
  */
-
-
 
 /** @typedef {object} CALCULATE_PP_RESPONSE
  * @property {object} difficulty
@@ -278,8 +264,6 @@ export default WebSocketManager;
  * @property {number} ppAccuracy
  * @property {number} effectiveMissCount
  */
-
-
 
 /** @typedef {object} WEBSOCKET_V1
  * @property {'stable' | 'lazer'} client
@@ -520,8 +504,6 @@ export default WebSocketManager;
  * @property {number} tourney.ipcClients.gameplay.mods.num
  * @property {string} tourney.ipcClients.gameplay.mods.str
  */
-
-
 
 /** @typedef {object} WEBSOCKET_V2
  * @property {'stable' | 'lazer'} client
@@ -970,8 +952,6 @@ export default WebSocketManager;
  * @property {number} tourney.clients.play.pp.detailed.fc.total
  * @property {number} tourney.clients.play.unstableRate
  */
-
-
 
 /** @typedef {object} WEBSOCKET_V2_PRECISE
  * @property {number} currentTime
