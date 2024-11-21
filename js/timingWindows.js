@@ -1,166 +1,94 @@
 // Calculate timing windows based on gamemode and OD
-export const calculateTimingWindowsForGamemode = (gamemode, od, mods) => {
+export const calculateTimingWindowsForGamemode = async (gamemode, od, mods) => {
     let modifiedOD = od;
+    
+    // Apply mod effects asynchronously
+    await Promise.resolve(); // Yield to event loop
+    
     switch (true) {
         case mods.includes('HR'):
             modifiedOD *= 1.4;
             if (modifiedOD > 10) {
                 modifiedOD = 10;
             }
-            switch (gamemode) {
-                case 'osu':
-                    return {
-                        300: 80 - (6 * modifiedOD),
-                        100: 140 - (8 * modifiedOD),
-                        50: 200 - (10 * modifiedOD),
-                        0: 400,
-                    };
-                    
-                case 'taiko':
-                    if (modifiedOD <= 5) {
-                        return {
-                            300: 50 - (3 * modifiedOD),
-                            100: 120 - (8 * modifiedOD),
-                            0: 138 - (8 * modifiedOD)
-                        };
-                    } else {
-                        return {
-                            300: 50 - (3 * modifiedOD),
-                            100: 110 - (6 * modifiedOD),
-                            0: 120 - (5 * modifiedOD)
-                        };
-                    }
-                case 'fruits':
-                    return {
-                        300: 80 - (6 * modifiedOD),
-                        100: 140 - (8 * modifiedOD),
-                        50: 200 - (10 * modifiedOD)
-                    };
-                    
-                case 'mania':
-                    return {
-                        '300g': 11.43,
-                        300: (64 - (3 * modifiedOD)) / 1.4,
-                        200: (97 - (3 * modifiedOD)) / 1.4,
-                        100: (127 - (3 * modifiedOD)) / 1.4,
-                        50: (151 - (3 * modifiedOD)) / 1.4,
-                        0: (188 - (3 * modifiedOD)) / 1.4
-                    };
-                                      
-                default:
-                    console.warn(`Unknown gamemode: ${gamemode}, falling back to osu standard`);
-                    return {
-                        300: 80 - (6 * modifiedOD),
-                        100: 140 - (8 * modifiedOD),
-                        50: 200 - (10 * modifiedOD)
-                    };
-            }
+            return calculateModeWindows(gamemode, modifiedOD, mods);
+            
         case mods.includes('EZ'):
             modifiedOD *= 0.5;
-            switch (gamemode) {
-                case 'osu':
-                    return {
-                        300: 80 - (6 * modifiedOD),
-                        100: 140 - (8 * modifiedOD),
-                        50: 200 - (10 * modifiedOD),
-                        0: 400,
-                    };
-                    
-                case 'taiko':
-                    if (modifiedOD <= 5) {
-                        return {
-                            300: 50 - (3 * modifiedOD),
-                            100: 120 - (8 * modifiedOD),
-                            0: 135 - (8 * modifiedOD)
-                        };
-                    } else {
-                        return {
-                            300: 50 - (3 * modifiedOD),
-                            100: 110 - (6 * modifiedOD),
-                            0: 120 - (5 * modifiedOD)
-                        };
-                    }
-                case 'fruits':
-                    return {
-                        300: 80 - (6 * modifiedOD),
-                        100: 140 - (8 * modifiedOD),
-                        50: 200 - (10 * modifiedOD)
-                    };
-                    
-                case 'mania':
-                    return {
-                        '300g': 22.5,
-                        300: 64 - (3 * modifiedOD),
-                        200: 97 - (3 * modifiedOD),
-                        100: 127 - (3 * modifiedOD),
-                        50: 151 - (3 * modifiedOD),
-                        0: 188 - (3 * modifiedOD)
-                    };
-                      
-                default:
-                    console.warn(`Unknown gamemode: ${gamemode}, falling back to osu standard`);
-                    return {
-                        300: 80 - (6 * modifiedOD),
-                        100: 140 - (8 * modifiedOD),
-                        50: 200 - (10 * modifiedOD)
-                    };
-            }
+            return calculateModeWindows(gamemode, modifiedOD, mods);
+            
         default:
-            switch (gamemode) {
-                case 'osu':
-                    return {
-                        300: 80 - (6 * od),
-                        100: 140 - (8 * od),
-                        50: 200 - (10 * od),
-                        0: 400,
-                    };
-                    
-                case 'taiko':
-                    if (od <= 5) {
-                        return {
-                            300: 50 - (3 * od),
-                            100: 120 - (8 * od),
-                            0: 135 - (8 * od)
-                        };
-                    } else {
-                        return {
-                            300: 50 - (3 * od),
-                            100: 110 - (6 * od),
-                            0: 120 - (5 * od)
-                        };
-                    }
-                case 'fruits':
-                    return {
-                        300: 80 - (6 * od),
-                        100: 140 - (8 * od),
-                        50: 200 - (10 * od)
-                    };
-                    
-                case 'mania':
-                    return {
-                        '300g': 16.5,
-                        300: 64 - (3 * od),
-                        200: 97 - (3 * od),
-                        100: 127 - (3 * od),
-                        50: 151 - (3 * od),
-                        0: 188 - (3 * od)
-                    };
-                    
-                default:
-                    console.warn(`Unknown gamemode: ${gamemode}, falling back to osu standard`);
-                    return {
-                        300: 80 - (6 * od),
-                        100: 140 - (8 * od),
-                        50: 200 - (10 * od)
-                    };
-            }
+            return calculateModeWindows(gamemode, modifiedOD, mods);
+    }
+};
 
+// Calculate windows for specific gamemode
+const calculateModeWindows = async (gamemode, od, mods = []) => {
+    await Promise.resolve(); // Yield to event loop
+    
+    switch (gamemode) {
+        case 'osu':
+            return {
+                300: 80 - (6 * od),
+                100: 140 - (8 * od),
+                50: 200 - (10 * od),
+                0: 400,
+            };
+            
+        case 'taiko':
+            if (od <= 5) {
+                return {
+                    300: 50 - (3 * od),
+                    100: 120 - (8 * od),
+                    0: 135 - (8 * od)
+                };
+            }
+            return {
+                300: 50 - (3 * od),
+                100: 110 - (6 * od),
+                0: 120 - (5 * od)
+            };
+            
+        case 'fruits':
+            return {
+                300: 80 - (6 * od),
+                100: 140 - (8 * od),
+                50: 200 - (10 * od)
+            };
+            
+        case 'mania':
+            return {
+                '300g': mods.includes('EZ') ? 22.5 : 11.43,
+                300: mods.includes('HR') ? 
+                    (64 - (3 * od)) / 1.4 : 
+                    64 - (3 * od),
+                200: mods.includes('HR') ? 
+                    (97 - (3 * od)) / 1.4 : 
+                    97 - (3 * od),
+                100: mods.includes('HR') ? 
+                    (127 - (3 * od)) / 1.4 : 
+                    127 - (3 * od),
+                50: mods.includes('HR') ? 
+                    (151 - (3 * od)) / 1.4 : 
+                    151 - (3 * od),
+                0: mods.includes('HR') ? 
+                    (188 - (3 * od)) / 1.4 : 
+                    188 - (3 * od)
+            };
+            
+        default:
+            console.warn(`Unknown gamemode: ${gamemode}, falling back to osu standard`);
+            return {
+                300: 80 - (6 * od),
+                100: 140 - (8 * od),
+                50: 200 - (10 * od)
+            };
     }
 };
 
 // Update timing window display in the DOM
-export const updateTimingWindows = (gamemode, od, mods) => {
-    const timingWindows = calculateTimingWindowsForGamemode(gamemode, od, mods);
+export const updateTimingWindows = async (gamemode, od, mods) => {
+    const timingWindows = await calculateTimingWindowsForGamemode(gamemode, od, mods);
     const colorsContainer = document.querySelector('.colors-container');
     console.log('Timing windows:', timingWindows);
     

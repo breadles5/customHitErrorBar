@@ -1,5 +1,32 @@
-// Initialize empty settings object
-export let settings = {};
+// Initialize empty settings object with defaults to avoid undefined checks
+export let settings = {
+    TimingWindowOpacity: 0.4,
+    barHeight: 60,
+    barWidth: 10,
+    tickWidth: 10,
+    tickHeight:50,
+    tickDuration: 1500,
+    fadeOutDuration: 300,
+    arrowSize: 30,
+    timingWindowHeight: 50,
+    isRounded: 100,
+    color300g: '#66CCFF',
+    color300: '#66FF66',
+    color200: '#FFFF66',
+    color100: '#FFAA33',
+    color50: '#FF6666',
+    color0: '#FF0000',
+    showSD: true,
+    visible: true
+};
+
+// Cache DOM element
+const root = document.documentElement;
+
+// Cache calculated values
+let lastWindowHeight = 0;
+let lastRoundedPercent = 0;
+let cssCache = new Map();
 
 export function getSettings() {
     return settings;
@@ -7,46 +34,73 @@ export function getSettings() {
 
 // Update settings with new values
 export function updateSettings(message) {
-    // Update all settings from message
-    Object.assign(settings, message);
+    const oldSettings = { ...settings };
     
-    // Update CSS variables and visibility
-    updateCSSVariables();
-    updateVisibility();
+    // Update changed settings only
+    let hasVisualChanges = false;
+    let hasLayoutChanges = false;
+    
+    for (const [key, value] of Object.entries(message)) {
+        if (settings[key] !== value) {
+            settings[key] = value;
+            
+            // Track what kind of changes occurred
+            if (key.startsWith('color') || key === 'TimingWindowOpacity') {
+                hasVisualChanges = true;
+            } else {
+                hasLayoutChanges = true;
+            }
+        }
+    }
+    
+    // Only update what changed
+    if (hasLayoutChanges) {
+        updateCSSLayout();
+    }
+    if (hasVisualChanges) {
+        updateCSSColors();
+    }
+    
+    // Update visibility if needed
+    if (message.hasOwnProperty('showSD') && oldSettings.showSD !== message.showSD) {
+        updateVisibility();
+    }
 }
 
-export const updateCSSVariables = () => {
-    const root = document.documentElement;
-
-    // Update existing variables
-    root.style.setProperty('--timing-windows-opacity', settings.TimingWindowOpacity);
+// Split CSS updates into layout and colors
+const updateCSSLayout = () => {
+    // Update size-related variables
     root.style.setProperty('--bar-height', `${settings.barHeight}px`);
     root.style.setProperty('--bar-width', `${settings.barWidth}px`);
     root.style.setProperty('--tick-width', `${settings.tickWidth}px`);
     root.style.setProperty('--tick-height', `${settings.tickHeight}px`);
-    root.style.setProperty('--tick-duration', `${settings.tickDuration}ms`);
-    root.style.setProperty('--fade-out-duration', `${settings.fadeOutDuration}ms`);
     root.style.setProperty('--arrow-size', `${settings.arrowSize}px`);
-
-    // Add timing window height (clamped between 0-100)
-    const clampedHeight = Math.max(0, Math.min(100, settings.timingWindowHeight));
-    root.style.setProperty('--timing-window-height', clampedHeight);
-
-    // Calculate rounded corners based on percentage
-    const roundedPercent = Math.max(0, Math.min(100, settings.isRounded)) / 100;
-
-    // For timing windows, use percentage of height since they're horizontal elements
+    
+    // Calculate timing window height only if changed
     const windowHeight = settings.barHeight * (settings.timingWindowHeight / 100);
-    const windowRadius = (windowHeight / 2) * roundedPercent;
-    root.style.setProperty('--timing-window-radius', `${windowRadius}px`);
+    if (windowHeight !== lastWindowHeight) {
+        lastWindowHeight = windowHeight;
+        const clampedHeight = Math.max(0, Math.min(100, settings.timingWindowHeight));
+        root.style.setProperty('--timing-window-height', clampedHeight);
+    }
+    
+    // Calculate rounded corners only if changed
+    const roundedPercent = Math.max(0, Math.min(100, settings.isRounded)) / 100;
+    if (roundedPercent !== lastRoundedPercent) {
+        lastRoundedPercent = roundedPercent;
+        
+        const windowRadius = (windowHeight / 2) * roundedPercent;
+        const barRadius = (settings.barWidth / 2) * roundedPercent;
+        const tickRadius = (settings.tickWidth / 2) * roundedPercent;
+        
+        root.style.setProperty('--timing-window-radius', `${windowRadius}px`);
+        root.style.setProperty('--bar-radius', `${barRadius}px`);
+        root.style.setProperty('--tick-radius', `${tickRadius}px`);
+    }
+};
 
-    // For bar and ticks, use percentage of width since they're vertical elements
-    const barRadius = (settings.barWidth / 2) * roundedPercent;
-    const tickRadius = (settings.tickWidth / 2) * roundedPercent;
-    root.style.setProperty('--bar-radius', `${barRadius}px`);
-    root.style.setProperty('--tick-radius', `${tickRadius}px`);
-
-    // Update colors
+const updateCSSColors = () => {
+    root.style.setProperty('--timing-windows-opacity', settings.TimingWindowOpacity);
     root.style.setProperty('--color-300g', settings.color300g);
     root.style.setProperty('--color-300', settings.color300);
     root.style.setProperty('--color-200', settings.color200);
@@ -59,9 +113,9 @@ export const updateCSSVariables = () => {
     root.style.setProperty('--bar-color', settings.colorBar);
 };
 
-function updateVisibility() {
+export const updateVisibility = () => {
     const sd = document.querySelector('.sd');
     if (sd) {
         sd.style.display = settings.showSD ? 'block' : 'none';
     }
-}
+};

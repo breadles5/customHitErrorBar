@@ -21,7 +21,7 @@
     /* Sizes */
     --tick-width: 10px;
     --tick-height: 50px;
-    --container-width: 400px;
+    --container-width: 940px;
     --arrow-size: 20px;
     --tick-radius: 0px;
 
@@ -50,7 +50,6 @@ html {
     align-items: center;
     width: var(--container-width);
     contain: layout style;
-    will-change: transform;
     position: relative;
     height: var(--bar-height);
 }
@@ -62,7 +61,6 @@ html {
     transition: linear 200ms;
     width: var(--container-width);
     contain: content;
-    will-change: contents;
 }
 
 /*arrow*/
@@ -82,7 +80,7 @@ html {
     border-right: calc(var(--arrow-size) * 0.667) solid transparent;
     border-top: var(--arrow-size) solid var(--arrow-perfect);
     transform: translateZ(0);
-    will-change: transform, border-top-color;
+    will-change: transform;
 }
 
 .colors-container,
@@ -94,7 +92,6 @@ html {
     height: var(--bar-height);
     width: var(--container-width);
     contain: layout paint style;
-    will-change: transform;
 }
 
 .colors-container {
@@ -108,7 +105,6 @@ html {
     transition: linear 200ms;
     border-radius: var(--timing-window-radius);
     contain: layout paint;
-    will-change: width;
 }
 
 /* Timing window colors */
@@ -144,18 +140,29 @@ html {
 }
 
 /* Tick styling */
-.tick {
-    height: var(--tick-height);
-    width: var(--tick-width);
-    border-radius: var(--tick-radius);
+.tick-container {
     position: absolute;
-    opacity: 1;
-    transition: opacity var(--fade-out-duration) linear;
-    z-index: 7;
-    transform: translateZ(0);
-    will-change: transform, opacity;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--bar-height);
+    width: var(--container-width);
     contain: layout paint style;
-    backface-visibility: hidden;
+    overflow: hidden;
+    clip-path: inset(0);
+}
+
+.tick {
+    position: absolute;
+    width: var(--tick-width);
+    height: var(--tick-height);
+    border-radius: var(--tick-radius);
+    background: var(--color-0);
+    transform: translateX(0);
+    will-change: transform;
+    contain: layout paint style;
+    transition: opacity var(--fade-out-duration) linear;
+    opacity: 1;
 }
 
 .tick.fade-out {
