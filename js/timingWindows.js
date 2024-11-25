@@ -24,7 +24,7 @@ export const calculateTimingWindowsForGamemode = async (gamemode, od, mods) => {
 
 // Calculate windows for specific gamemode
 const calculateModeWindows = async (gamemode, od, mods = []) => {
-  await Promise.resolve(); // Yield to event loop
+  await gamemode; // Yield to event loop
 
   switch (gamemode) {
     case "osu":
@@ -58,7 +58,7 @@ const calculateModeWindows = async (gamemode, od, mods = []) => {
 
     case "mania":
       return {
-        "300g": mods.includes("EZ") ? 22.5 : 11.43,
+        "300g": mods.includes("EZ") ? 22.5 : mods.includes("HR") ? 11.43 : 11.43,
         300: mods.includes("HR") ? (64 - 3 * od) / 1.4 : 64 - 3 * od,
         200: mods.includes("HR") ? (97 - 3 * od) / 1.4 : 97 - 3 * od,
         100: mods.includes("HR") ? (127 - 3 * od) / 1.4 : 127 - 3 * od,
