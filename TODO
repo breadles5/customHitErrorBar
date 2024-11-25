@@ -1,2 +1,3 @@
 fix issues with clearing ticks
+    probably something to do with concurrent modification
 fix issues with prod build
