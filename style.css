@@ -159,9 +159,10 @@ html {
     border-radius: var(--tick-radius);
     background: var(--color-0);
     transform: translateX(0);
-    will-change: transform;
+    will-change: transform opacity;
     contain: layout paint style;
     transition: opacity var(--fade-out-duration) linear;
+    z-index: 7;
     opacity: 1;
 }
 
