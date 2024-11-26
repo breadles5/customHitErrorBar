@@ -1,26 +1,40 @@
-# customHitErrorBarV2
-A rewrite of my remaster of 2ky's custom hit error bar.   
-  - Built for [tosu](https://github.com/KotRikD/tosu) only, so don't use this in gosumemory.
-## themes
-Minimal:   
-<img width="500" alt="image" src="https://github.com/breadles5/customHitErrorBarV2/assets/101068519/6f47dce7-765f-42fe-a22c-cf38c95f0af0">    
-Default:   
-<img width="500" alt="image" src="https://github.com/breadles5/customHitErrorBarV2/assets/101068519/b6377d5c-4ffe-4ffa-935b-e9b5aed70b51">  
+# Custom Hit Error Bar
+
+My finalized version of the hit error bar. rewrote most of the code from scratch.
+should have compatibility with standard and taiko gamemodes, but main priority for this is osu!mania.
+
 ## Features
-Default theme:
-   1. resized to fit QHD screens right out the box (recommended scale of 7 or 8 in config.ini if you are using FHD screen)
-   2. more refined look, shows colors for each hit judgement timing window and appropriately resizes them to match current maps's OD
-   3. more resource efficient then 2ky's gosumemory hiterror colorful overlay through the use of more modern CSS features
-      
-Minimal theme:
-   1. resized to fit QHD screens right out the box (recommended scale of 7 or 8 in config.ini if you are using FHD screen)
-   2. minimal feature set other than just a plain and simple hit error bar that works
-   3. takes up the least amount of resources and is the fastest by cutting out unnecessary features and functions
-## Installation
-   1. download .zip of your choice in [releases](https://github.com/breadles5/customHitErrorBarV2/releases)
-   2. unzip folder to your counters/overlays folder
-   3. set url in config.ini for ingame overlay or use a source in obs
-   4. set overlay width and height to dimensions listed in [tosu dashboard](http://127.0.0.1:24050/) for overlay
-   5. reposition and resize using hotkeys listed in [gosu wiki](https://github.com/l3lackShark/gosumemory/wiki/GameOverlay)
-      
-you can find the url at http://127.0.0.1:24050/ (tosu dashboard)
+
+- Customizable settings accessible from the tosu dashboard
+  - change colors
+  - change sizes
+  - change opacities
+  - change rounded corners
+  - and more!
+- Tick lifetimes are now adjustable via settings, no longer determined by tick count.
+- standard deviation display (toggled in settings).
+
+## How to download
+
+1. Open Tosu Dashboard
+2. open `Avaiable` tab
+3. find `Custom Hit Error Bar`
+4. click `Download`
+
+### OBS instructions
+
+1. Open tosu dashboard
+2. click on URL button to copy URL
+3. Open OBS
+4. create new browser source
+5. paste URL
+6. paste Resolution width and height (940 x 150)
+
+### Ingame Overlay instructions
+
+1. Open tosu dashboard
+2. open settings tab
+3. set `ENABLE_INGAME_OVERLAY` to `enabled`
+4. restart both osu! and tosu
+5. press `Ctrl + Shift + Space` to open ingame overlay manager
+6. right click anywhere and select `Custom Hit Error Bar` in the dropdown menu
