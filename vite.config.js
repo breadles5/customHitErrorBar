@@ -18,7 +18,7 @@ const copyFile = (src, dest) => {
 export default defineConfig({
   build: {
     // Output to dist directory
-    outDir: "dist",
+    outDir: "dist/",
     // Use esbuild for better minification
     minify: "esbuild",
     // Generate sourcemaps for debugging
@@ -31,16 +31,21 @@ export default defineConfig({
       output: {
         // Optimize chunk size
         manualChunks: undefined,
-        // Clean URLs in production
+        // Prevent hash generation in filenames
         entryFileNames: "[name].js",
         chunkFileNames: "[name].js",
-        assetFileNames: "[name].[extname]",
+        assetFileNames: "[name][extname]",
       },
     },
     // Worker bundling options
     worker: {
       format: "es",
       plugins: [],
+      rollupOptions: {
+        output: {
+          entryFileNames: "[name].js"
+        }
+      }
     },
     // Optimize dependencies
     optimizeDeps: {
@@ -80,7 +85,7 @@ export default defineConfig({
     {
       name: "copy-assets",
       closeBundle() {
-        const files = ["metadata.txt", "settings.json"];
+        const files = ["metadata.txt", "settings.json", "readme.md"];
 
         files.forEach((file) => {
           const src = resolve(__dirname, file);
