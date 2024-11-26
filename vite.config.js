@@ -1,6 +1,9 @@
-import { defineConfig } from 'vite';
-import { resolve } from 'path';
-import fs from 'fs';
+import { defineConfig } from "vite";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Function to copy files to dist
 const copyFile = (src, dest) => {
@@ -15,66 +18,65 @@ const copyFile = (src, dest) => {
 export default defineConfig({
   build: {
     // Output to dist directory
-    outDir: 'dist',
+    outDir: "dist",
     // Use esbuild for better minification
-    minify: 'esbuild',
+    minify: "esbuild",
     // Generate sourcemaps for debugging
     sourcemap: true,
     // Configure rollup options
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html')
+        main: resolve(__dirname, "index.html"),
       },
       output: {
         // Optimize chunk size
         manualChunks: undefined,
         // Clean URLs in production
-        entryFileNames: '[name].[hash].js',
-        chunkFileNames: '[name].[hash].js',
-        assetFileNames: '[name].[hash][extname]'
-      }
+        entryFileNames: "[name].js",
+        chunkFileNames: "[name].js",
+        assetFileNames: "[name].[extname]",
+      },
     },
     // Worker bundling options
     worker: {
-      format: 'es',
-      plugins: []
+      format: "es",
+      plugins: [],
     },
     // Optimize dependencies
     optimizeDeps: {
-      include: ['socket.js', 'settings.js', 'timingWindows.js', 'ticks.js']
+      include: ["socket.js", "settings.js", "timingWindows.js", "ticks.js"],
     },
     // esbuild options for maximum minification
-    target: 'esnext',
+    target: "esnext",
     esbuild: {
-      legalComments: 'none',
+      legalComments: "none",
       treeShaking: true,
       minifyIdentifiers: true,
       minifySyntax: true,
-      minifyWhitespace: true
-    }
+      minifyWhitespace: true,
+    },
   },
   // Base public path - important for worker loading
-  base: '',
+  base: "",
   // Development server config
   server: {
     port: 3000,
     strictPort: true,
-    host: true
+    host: true,
   },
   // Custom plugin to copy files
-  plugins: [{
-    name: 'copy-assets',
-    closeBundle() {
-      const files = [
-        'metadata.txt',
-        'settings.json'
-      ];
-      
-      files.forEach(file => {
-        const src = resolve(__dirname, file);
-        const dest = resolve(__dirname, 'dist', file);
-        copyFile(src, dest);
-      });
-    }
-  }]
+  plugins: [
+    {
+      name: "copy-assets",
+      closeBundle() {
+        const files = ["metadata.txt", "settings.json"];
+
+        files.forEach((file) => {
+          const src = resolve(__dirname, file);
+          const dest = resolve(__dirname, "dist", file);
+          copyFile(src, dest);
+        });
+      },
+    },
+  ],
 });
