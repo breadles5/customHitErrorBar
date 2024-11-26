@@ -1,9 +1,9 @@
 import WebSocketManager from "./socket.js";
 import { updateSettings } from "./settings.js";
 import { elements } from "./elements.js";
-import { updateTimingWindows } from "./timingWindows.js";
-import { createTick } from "./ticks.js";
+import { tickCreator, tickRenderer } from "./modules/tickManager/index.js";
 import { getArrowColor } from "./elements.js";
+import { updateTimingWindows } from "./timingWindows.js";
 
 const DEFAULT_HOST = "127.0.0.1:24050";
 let wsManager = new WebSocketManager(DEFAULT_HOST);
@@ -14,9 +14,8 @@ let od = 0;
 let ur = 0;
 let mods = [];
 
-// Store timeouts and cache for cleanup
+// Store timeouts for cleanup
 const timeouts = [];
-const timingWindowCache = new Map();
 
 // Track local hit error history
 let lastHitErrorCount = 0;
@@ -24,7 +23,6 @@ let lastHitErrorCount = 0;
 // Initialize calculation worker
 let calculationWorker;
 try {
-  // First try importing as module (for production build)
   calculationWorker = new Worker(
     new URL("./calculationWorker.js", import.meta.url),
     {
@@ -32,7 +30,6 @@ try {
     },
   );
 } catch (err) {
-  // Fallback for direct file access
   calculationWorker = new Worker("./js/calculationWorker.js");
   console.error("Failed to load worker as module:", err);
 }
@@ -78,6 +75,13 @@ const reset = () => {
   // Reset worker
   calculationWorker.postMessage({ type: "reset" });
 
+  // Reset hit error count
+  lastHitErrorCount = 0;
+
+  // Clean up ticks and clear caches
+  tickRenderer.cleanup();
+  tickCreator.clearCache(); // Clear timing window cache on reset
+
   // Reset UI
   if (elements.sd) {
     elements.sd.textContent = "0.00";
@@ -97,6 +101,7 @@ wsManager.commands((data) => {
       "with data:",
       message,
     );
+
     if (command === "getSettings") {
       if (message.error) {
         console.error("[SETTINGS] Error:", message.error);
@@ -113,10 +118,9 @@ wsManager.commands((data) => {
       // Update settings with received values
       updateSettings(message);
     } else if (command === "updateSettings") {
-      // Also handle updateSettings command
       updateSettings(message);
       // Clear timing window cache when settings change
-      timingWindowCache.clear();
+      tickCreator.clearCache();
     }
   } catch (error) {
     console.error("[MESSAGE_ERROR] Error processing WebSocket message:", error);
@@ -130,12 +134,17 @@ wsManager.api_v2((data) => {
     const newState = data.state.number;
     if (state !== newState) {
       state = newState;
-      // Show elements during editing (2)
+      console.log(`[GameState] State changed from ${state} to ${newState}`);
+
+      // Show elements during playing (2)
       if (state === 2) {
         elements.allDivs?.forEach((div) => div.classList.remove("hidden"));
+        // Initialize timing windows when entering gameplay
+        updateTimingWindows(mode, od, mods);
       } else {
         elements.allDivs?.forEach((div) => div.classList.add("hidden"));
         // Always reset when leaving state 2
+        console.log("[GameState] Leaving play state, resetting...");
         reset();
       }
     }
@@ -143,6 +152,7 @@ wsManager.api_v2((data) => {
     if (ur !== data.play.unstableRate) {
       ur = data.play.unstableRate;
       if (ur === 0) {
+        console.log("[GameState] Unstable rate reset to 0, resetting...");
         reset();
       }
     }
@@ -156,10 +166,12 @@ wsManager.api_v2((data) => {
       mode = data.beatmap.mode.name;
       od = data.beatmap.stats.od.original;
       mods = data.play.mods.name;
+      // Update timing windows when parameters change
+      if (state === 2) {
+        updateTimingWindows(mode, od, mods);
+      }
       // Clear timing window cache when parameters change
-      timingWindowCache.clear();
-      // Update timing windows
-      updateTimingWindows(mode, od, mods);
+      tickCreator.clearCache();
     }
   } catch (error) {
     console.error("[MESSAGE_ERROR] Error processing WebSocket message:", error);
@@ -180,7 +192,7 @@ wsManager.api_v2_precise(async (data) => {
       // Process new hits
       for (const hit of newHits) {
         // Create tick and wait for timing windows
-        await createTick(hit, mode, od, mods);
+        await tickCreator.createTick(hit, mode, od, mods);
 
         // Send hit to worker for calculation
         calculationWorker.postMessage({
@@ -195,4 +207,7 @@ wsManager.api_v2_precise(async (data) => {
 });
 
 // Cleanup on page unload
-window.addEventListener("unload", cleanup);
+window.addEventListener("unload", () => {
+  cleanup();
+  tickRenderer.cleanup();
+});

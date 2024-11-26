@@ -79,6 +79,11 @@ export const updateSettings = (message) => {
 // Split CSS updates into layout and colors
 const updateCSSLayout = () => {
   // Update size-related variables
+  root.style.setProperty(
+    "--fade-out-duration",
+    `${settings.fadeOutDuration}ms`,
+  );
+  root.style.setProperty("--tick-duration", `${settings.tickDuration}ms`);
   root.style.setProperty("--bar-height", `${settings.barHeight}px`);
   root.style.setProperty("--bar-width", `${settings.barWidth}px`);
   root.style.setProperty("--tick-width", `${settings.tickWidth}px`);
