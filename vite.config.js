@@ -44,7 +44,18 @@ export default defineConfig({
     },
     // Optimize dependencies
     optimizeDeps: {
-      include: ["socket.js", "settings.js", "timingWindows.js", "ticks.js"],
+      include: [
+        // Core modules
+        "./js/elements.js",
+        "./js/settings.js",
+        "./js/timingWindows.js",
+        "./js/socket.js",
+        // Tick manager modules
+        "./js/modules/tickManager/index.js",
+        "./js/modules/tickManager/pool.js",
+        "./js/modules/tickManager/renderer.js",
+        "./js/modules/tickManager/creator.js"
+      ],
     },
     // esbuild options for maximum minification
     target: "esnext",
