@@ -13,11 +13,11 @@ jobs:
     steps:
       # Step 1: Checkout the repository
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Step 2: Set up Node.js
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '20' # Adjust to your project's Node.js version
 
@@ -45,7 +45,7 @@ jobs:
 
       # Step 7: Upload the zip file as an artifact
       - name: Upload the artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-zip
           path: ${{ steps.get-project-name.outputs.PROJECT_NAME }}.zip
