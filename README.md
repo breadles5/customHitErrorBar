@@ -3,6 +3,10 @@
 My finalized version of the hit error bar. rewrote most of the code from scratch.
 should have compatibility with standard and taiko gamemodes, but main priority for this is osu!mania.
 
+## Preview
+![preview](https://github.com/user-attachments/assets/c7d348e1-7984-4e7e-b20e-cfa61737b4f3)
+
+
 ## Features
 
 - Customizable settings accessible from the tosu dashboard
