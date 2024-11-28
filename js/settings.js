@@ -9,6 +9,7 @@ export let settings = {
   tickDuration: 0,
   fadeOutDuration: 0,
   arrowSize: 0,
+  perfectArrowThreshold: 0,
   colorArrowEarly: "#000000",
   colorArrowLate: "#000000",
   colorArrowPerfect: "#000000",

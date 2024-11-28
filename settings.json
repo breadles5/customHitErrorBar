@@ -104,7 +104,7 @@
     "value": 30
   },
   {
-    "uniqueID": "PerfectArrowThreshold",
+    "uniqueID": "perfectArrowThreshold",
     "type": "number",
     "title": "Perfect Arrow Threshold (ms)",
     "description": "",

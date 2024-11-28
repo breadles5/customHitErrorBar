@@ -56,7 +56,7 @@ calculationWorker.onmessage = (e) => {
 function updateArrowPosition(targetPosition, targetColor) {
   if (elements.arrow) {
     elements.arrow.style.transform = `translateX(${targetPosition}px)`;
-    elements.arrow.style.color = targetColor;
+    elements.arrow.style.borderTopColor = targetColor;
   }
 }
 

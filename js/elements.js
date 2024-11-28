@@ -55,7 +55,7 @@ export const average = (arr) => {
 
 export const getArrowColor = (error) => {
   const absError = Math.abs(error);
-  const threshold = settings.PerfectArrowThreshold;
+  const threshold = settings.perfectArrowThreshold;
   if (absError <= threshold) {
     return "var(--arrow-perfect)";
   } else if (error < 0) {
