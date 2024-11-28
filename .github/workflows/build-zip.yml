@@ -39,13 +39,14 @@ jobs:
       # Step 6: Zip the build directory
       - name: Zip the build directory
         run: |
-          ZIP_NAME="${{ steps.get-project-name.outputs.PROJECT_NAME }}.zip"
-          zip -r $ZIP_NAME dist/ # Replace 'dist/' with your build output directory
+          cd dist
+          zip -r ../${{ steps.get-project-name.outputs.PROJECT_NAME }}.zip ./*
         shell: bash
 
       # Step 7: Upload the zip file as an artifact
       - name: Upload the artifact
         uses: actions/upload-artifact@v4
         with:
-          name: build-zip
+          name: ${{ steps.get-project-name.outputs.PROJECT_NAME }}
           path: ${{ steps.get-project-name.outputs.PROJECT_NAME }}.zip
+          compression-level: 0  # Skip compression since file is already zipped
