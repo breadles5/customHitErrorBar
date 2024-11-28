@@ -3,7 +3,7 @@ name: Build and Zip Artifacts
 on:
   push:
     branches:
-      - main # Run this workflow on pushes to the 'main' branch
+      - '**'  # This will match all branches
   pull_request: # Optional: Run on pull requests too
 
 jobs:
@@ -29,17 +29,23 @@ jobs:
       - name: Build the project
         run: npm run build
 
-      # Step 5: Zip the build directory
-      - name: Zip the build directory
+      # Step 5: Get Project Name
+      - name: Get Project Name
+        id: get-project-name
         run: |
           PROJECT_NAME=$(node -p "require('./package.json').name")
-          ZIP_NAME="${PROJECT_NAME}.zip"
+          echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_OUTPUT
+
+      # Step 6: Zip the build directory
+      - name: Zip the build directory
+        run: |
+          ZIP_NAME="${{ steps.get-project-name.outputs.PROJECT_NAME }}.zip"
           zip -r $ZIP_NAME dist/ # Replace 'dist/' with your build output directory
         shell: bash
 
-      # Step 6: Upload the zip file as an artifact
+      # Step 7: Upload the zip file as an artifact
       - name: Upload the artifact
         uses: actions/upload-artifact@v3
         with:
           name: build-zip
-          path: ${{ env.PROJECT_NAME }}.zip
+          path: ${{ steps.get-project-name.outputs.PROJECT_NAME }}.zip
