@@ -43,7 +43,10 @@ html {
   background: rgba(0, 0, 0, 0);
   contain: layout style paint;
 }
-
+body {
+  display: flex;
+  justify-content: center;
+}
 .main {
   display: flex;
   flex-direction: column;
@@ -52,8 +55,8 @@ html {
   contain: layout style;
   position: relative;
   height: var(--bar-height);
+  justify-self: center;
 }
-
 .sd {
   text-align: center;
   font:
@@ -64,6 +67,7 @@ html {
   transition: linear 200ms;
   width: var(--container-width);
   contain: content;
+  justify-self: center;
 }
 
 /*arrow*/
@@ -73,6 +77,7 @@ html {
   width: var(--container-width);
   height: var(--arrow-size);
   contain: layout size;
+  justify-self: center;
 }
 
 .arrow {
