@@ -13,8 +13,6 @@ class TickPool {
 
     for (let i = 0; i < POOL_SIZE; i++) {
       const tick = document.createElement("div");
-      tick.style.position = "absolute";
-      tick.style.willChange = "transform";
       this.pool[i] = tick;
     }
     this.initialized = true;
@@ -47,11 +45,6 @@ class TickPool {
 
     // Clear any inline styles
     tick.style.cssText = "";
-
-    // Ensure position and transform are explicitly reset
-    tick.style.position = "absolute";
-    tick.style.willChange = "transform";
-
     if (tick.parentNode) {
       tick.parentNode.removeChild(tick);
     }
