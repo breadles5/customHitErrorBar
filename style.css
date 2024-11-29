@@ -36,12 +36,13 @@
 }
 
 body,
-html {
+html{
   margin: 0;
   padding: 0;
   overflow: hidden;
   background: rgba(0, 0, 0, 0);
   contain: layout style paint;
+  transition: opacity 200ms linear;
 }
 body {
   display: flex;
@@ -221,5 +222,4 @@ body {
 .hidden {
   opacity: 0 !important;
   pointer-events: none;
-  visibility: hidden;
 }

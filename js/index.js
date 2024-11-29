@@ -137,14 +137,22 @@ wsManager.api_v2((data) => {
 
       // Show elements during playing (2)
       if (state === 2) {
-        elements.allDivs?.forEach((div) => div.classList.remove("hidden"));
-        // Initialize timing windows when entering gameplay
-        updateTimingWindows(mode, od, mods);
+        requestAnimationFrame(() => {
+          elements.allDivs?.forEach((div) => div.classList.remove("hidden"));
+          // Initialize timing windows when entering gameplay
+          updateTimingWindows(mode, od, mods);
+        });
       } else {
-        elements.allDivs?.forEach((div) => div.classList.add("hidden"));
+        // Fade out elements when leaving gameplay
+        elements.allDivs?.forEach((div) => {
+          div.classList.add("hidden");
+        });
         // Always reset when leaving state 2
         console.log("[GameState] Leaving play state, resetting...");
-        reset();
+        // Wait for fade out to complete before resetting
+        setTimeout(() => {
+          reset();
+        }, 200); // Match the CSS transition duration
       }
     }
 
