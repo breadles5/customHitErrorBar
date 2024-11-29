@@ -11,7 +11,6 @@ let currentHost = DEFAULT_HOST;
 let state = 0;
 let mode = "";
 let od = 0;
-let ur = 0;
 let mods = [];
 
 // Store timeouts for cleanup
@@ -133,8 +132,8 @@ wsManager.api_v2((data) => {
     // Update state visibility
     const newState = data.state.number;
     if (state !== newState) {
-      state = newState;
       console.log(`[GameState] State changed from ${state} to ${newState}`);
+      state = newState;
 
       // Show elements during playing (2)
       if (state === 2) {
@@ -145,14 +144,6 @@ wsManager.api_v2((data) => {
         elements.allDivs?.forEach((div) => div.classList.add("hidden"));
         // Always reset when leaving state 2
         console.log("[GameState] Leaving play state, resetting...");
-        reset();
-      }
-    }
-
-    if (ur !== data.play.unstableRate) {
-      ur = data.play.unstableRate;
-      if (ur === 0) {
-        console.log("[GameState] Unstable rate reset to 0, resetting...");
         reset();
       }
     }
@@ -188,7 +179,9 @@ wsManager.api_v2_precise(async (data) => {
       // Get all new hits
       const newHits = hits.slice(lastHitErrorCount);
       lastHitErrorCount = hits.length;
-
+      if (newHits.length === 0) {
+        cleanup();
+      }
       // Process new hits
       for (const hit of newHits) {
         // Create tick and wait for timing windows

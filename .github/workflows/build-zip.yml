@@ -3,7 +3,7 @@ name: Build and Zip Artifacts
 on:
   push:
     branches:
-      - '**'  # This will match all branches
+      - "**" # This will match all branches
   pull_request: # Optional: Run on pull requests too
 
 jobs:
@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20' # Adjust to your project's Node.js version
+          node-version: "20" # Adjust to your project's Node.js version
 
       # Step 3: Install dependencies
       - name: Install dependencies
@@ -49,4 +49,4 @@ jobs:
         with:
           name: ${{ steps.get-project-name.outputs.PROJECT_NAME }}
           path: ${{ steps.get-project-name.outputs.PROJECT_NAME }}.zip
-          compression-level: 0  # Skip compression since file is already zipped
+          compression-level: 0 # Skip compression since file is already zipped

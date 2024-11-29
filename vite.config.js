@@ -43,9 +43,9 @@ export default defineConfig({
       plugins: [],
       rollupOptions: {
         output: {
-          entryFileNames: "[name].js"
-        }
-      }
+          entryFileNames: "[name].js",
+        },
+      },
     },
     // Optimize dependencies
     optimizeDeps: {
@@ -59,7 +59,7 @@ export default defineConfig({
         "./js/modules/tickManager/index.js",
         "./js/modules/tickManager/pool.js",
         "./js/modules/tickManager/renderer.js",
-        "./js/modules/tickManager/creator.js"
+        "./js/modules/tickManager/creator.js",
       ],
     },
     // esbuild options for maximum minification
