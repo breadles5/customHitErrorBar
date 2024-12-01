@@ -1,5 +1,7 @@
 {
   "name": "custom-hit-error-bar",
+  "author": "breadles",
+  "license": "GPL-3.0-only",
   "version": "3.0.0",
   "type": "module",
   "scripts": {

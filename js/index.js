@@ -181,15 +181,15 @@ wsManager.api_v2((data) => {
 wsManager.api_v2_precise(async (data) => {
   try {
     const hits = data.hitErrors ?? [];
-
+    if (hits.length === 0) {
+      reset();
+    }
     // Only process new hit errors
     if (hits.length > lastHitErrorCount) {
       // Get all new hits
       const newHits = hits.slice(lastHitErrorCount);
       lastHitErrorCount = hits.length;
-      if (newHits.length === 0) {
-        cleanup();
-      }
+
       // Process new hits
       for (const hit of newHits) {
         // Create tick and wait for timing windows
