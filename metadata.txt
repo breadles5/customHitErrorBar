@@ -1,5 +1,5 @@
 Usecase: Ingame Overlay, OBS Overlay
-Name: customHitErrorBar
+Name: customHitErrorBar(TS-beta)
 Version: 3.0.0
 Author: breadles
 CompatibleWith: Tosu
