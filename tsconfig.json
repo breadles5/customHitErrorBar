@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "allowJs": true,
+        "lib": ["esnext", "dom"],
+        "allowImportingTsExtensions": true,
+        "noEmit": true
+    },
+    "include": ["src/**/*"],
+    "exclude": ["node_modules"]
+}
