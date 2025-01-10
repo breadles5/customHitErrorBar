@@ -1,7 +1,10 @@
 # Custom Hit Error Bar
 
-My finalized version of the hit error bar. rewrote most of the code from scratch.
-should have compatibility with standard and taiko gamemodes, but main priority for this is osu!mania.
+An external hit error / UR bar implementation for osu!, powered by [tosu](https://github.com/tosuapp/tosu).  
+designed around customization and performance, with a focus on compatibility with osu!mania.  
+rewritten in typescript mostly from scratch, and designed to be easy to maintain and extend.
+
+[//]: # (TODO: update preview upon successful production build)
 
 ## Preview
 
@@ -40,5 +43,11 @@ should have compatibility with standard and taiko gamemodes, but main priority f
 2. open settings tab
 3. set `ENABLE_INGAME_OVERLAY` to `enabled`
 4. restart both osu! and tosu
-5. press `Ctrl + Shift + Space` to open ingame overlay manager
+5. press `Ctrl` + `Shift` + `Space` to open ingame overlay manager
 6. right click anywhere and select `Custom Hit Error Bar` in the dropdown menu
+
+### Contributing
+
+Any contributions are welcome!  
+Feel free to open an issue or a pull request.
+See [CONTRIBUTING.md](https://github.com/breadles5/customHitErrorBar/blob/main/CONTRIBUTING.md) for more information.
