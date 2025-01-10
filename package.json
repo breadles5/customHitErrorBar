@@ -5,9 +5,7 @@
     "version": "3.0.0",
     "type": "module",
     "scripts": {
-        "dev": "vite",
         "build": "vite build",
-        "preview": "vite preview",
         "format": "biome format ./src",
         "lint": "biome lint ./src"
     },
