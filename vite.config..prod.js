@@ -19,11 +19,11 @@ export default defineConfig({
     build: {
         // Output to dist directory
         emptyOutDir: true,
-        outDir: "../../customHitErrorBar",
+        outDir: "../../dist.customHitErrorBar",
         // Use esbuild for better minification
         minify: "esbuild",
         // Generate sourcemaps for debugging
-        sourcemap: true,
+        sourcemap: false,
         // Configure rollup options
         rollupOptions: {
             input: {
@@ -48,8 +48,8 @@ export default defineConfig({
         esbuild: {
             legalComments: "none",
             treeShaking: true,
-            minifyIdentifiers: false,
-            minifySyntax: false,
+            minifyIdentifiers: true,
+            minifySyntax: true,
             minifyWhitespace: true,
         },
     },
@@ -70,7 +70,7 @@ export default defineConfig({
 
                 files.forEach((file) => {
                     const src = resolve(__dirname, file);
-                    const dest = resolve(__dirname, "../../customHitErrorBar", file);
+                    const dest = resolve(__dirname, "../../dist.customHitErrorBar", file);
                     copyFile(src, dest);
                 });
             },
@@ -88,6 +88,15 @@ export default defineConfig({
                 chunkFileNames: "[name].js",
                 assetFileNames: "[name][extname]",
             },
+        },
+        // esbuild options for maximum minification
+        target: "esnext",
+        esbuild: {
+            legalComments: "none",
+            treeShaking: true,
+            minifyIdentifiers: true,
+            minifySyntax: true,
+            minifyWhitespace: true,
         },
     },
 });
