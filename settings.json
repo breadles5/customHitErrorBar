@@ -101,7 +101,7 @@
         "title": "Arrow Size (px)",
         "description": "",
         "options": [],
-        "value": 30
+        "value": 25
     },
     {
         "uniqueID": "perfectArrowThreshold",
@@ -125,7 +125,7 @@
         "title": "Center Bar Width (px)",
         "description": "",
         "options": [],
-        "value": 10
+        "value": 8
     },
     {
         "uniqueID": "barHeight",
@@ -133,7 +133,7 @@
         "title": "Center Bar Height (px)",
         "description": "",
         "options": [],
-        "value": 75
+        "value": 60
     },
     {
         "uniqueID": "tickWidth",
@@ -141,7 +141,7 @@
         "title": "Tick Width (px)",
         "description": "",
         "options": [],
-        "value": 10
+        "value": 8
     },
     {
         "uniqueID": "tickHeight",
@@ -149,7 +149,7 @@
         "title": "Tick Height (px)",
         "description": "",
         "options": [],
-        "value": 50
+        "value": 40
     },
     {
         "uniqueID": "tickOpacity",
@@ -189,6 +189,6 @@
         "title": "Rounded Elements (%)",
         "description": "",
         "options": [],
-        "value": 0
+        "value": 100
     }
 ]

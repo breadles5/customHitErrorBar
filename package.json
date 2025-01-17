@@ -5,10 +5,10 @@
     "version": "3.0.0",
     "type": "module",
     "scripts": {
-        "build": "vite build && echo 'https://localhost:24050/dist.customHitErrorBar'",
-        "build:prod": "vite build --config vite.config.prod.js && echo 'https://localhost:24050/dist.customHitErrorBar'",
-        "format": "biome format ./src",
-        "lint": "biome lint ./src"
+        "build": "vite build && echo http://localhost:24050/dist.customHitErrorBar",
+        "build:prod": "vite build --config vite.config.prod.js && echo http://localhost:24050/dist.customHitErrorBar",
+        "format": "biome format ./src --write",
+        "lint": "biome lint ./src --write"
     },
     "devDependencies": {
         "@biomejs/biome": "^1.9.4",

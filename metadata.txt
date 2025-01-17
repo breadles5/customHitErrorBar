@@ -3,5 +3,5 @@ Name: customHitErrorBar(TS-beta)
 Version: 3.0.0
 Author: breadles
 CompatibleWith: Tosu
-Resolution:  940 x 150
+Resolution:  752 x 150
 authorLinks:  https://github.com/breadles5
