@@ -66,7 +66,7 @@ export default defineConfig({
         {
             name: "copy-assets",
             closeBundle() {
-                const files = ["metadata.txt", "settings.json", "readme.md"];
+                const files = ["metadata.txt", "settings.json", "README.md"];
 
                 files.forEach((file) => {
                     const src = resolve(__dirname, file);
