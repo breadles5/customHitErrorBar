@@ -109,7 +109,7 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
             cache.state = data.state.name;
 
             // Show elements during playing
-            if (cache.state === "Playing") {
+            if (cache.state === "play") {
                 setVisible();
                 updateTimingWindowElements();
                 cache.isReset = false;
@@ -158,7 +158,7 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
                 cache.isUIreset = true; // prevents resetting the UI on the next callback
             }
         } else {
-            if (cache.state === "Playing") {
+            if (cache.state === "play") {
                 ticksWorker.postMessage({ type: "update", data: hits });
                 statisticsWorker.postMessage({ type: "update", data: cache.tickPool });
                 // recieve tick pool and statistics from workers
