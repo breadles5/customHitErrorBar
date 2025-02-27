@@ -1,7 +1,11 @@
 # Custom Hit Error Bar
 
 My finalized version of the hit error bar. rewrote most of the code from scratch.
-should have compatibility with standard and taiko gamemodes, but main priority for this is osu!mania.
+
+> [!NOTE]
+> should have compatibility with standard and taiko gamemodes, but main priority for this is osu!mania.  
+> pull requests to fix compatibility are always welcome  
+> the current main development branch is `typescript` 
 
 ## Preview
 
