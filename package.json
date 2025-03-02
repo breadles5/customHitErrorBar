@@ -5,7 +5,7 @@
     "version": "3.0.0",
     "type": "module",
     "scripts": {
-        "build": "vite build && echo http://localhost:24050/dist.customHitErrorBar",
+        "build": "vite build && echo http://localhost:24050/customHitErrorBar",
         "build:prod": "vite build --config vite.config.prod.js && echo http://localhost:24050/dist.customHitErrorBar",
         "format": "biome format ./src --write",
         "lint": "biome lint ./src --write"
