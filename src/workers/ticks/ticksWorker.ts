@@ -26,23 +26,20 @@ self.onmessage = (event) => {
                 postMessage(tickPool.pool);
             }
             break;
-        case "init":
+        case "set":
+            // on map end, timing windows remain the same, as they are not sent to the worker,
+            // on map start, timing windows are sent to the worker. to be updated
+            const timingWindows = data ?? new Map<PropertyKey, number>();
             tickPool.set();
-            // only timing windows are being sent to the worker
-            tickPoolCache.timingWindows = data;
-            console.log("[Tick Worker] tickPool initialized");
-            break;
-        case "reset":
-            if (tickPool) {
-                tickPool.set();
-            }
             tickPoolCache = {
                 localHitErrors: [],
-                timingWindows: new Map<PropertyKey, number>(),
+                timingWindows: timingWindows,
                 timedOutHits: 0,
                 processedHits: 0,
             };
             console.log("[Tick Worker] tickPool reset");
             break;
+        default:
+            console.error("[Tick Worker] unknown message type:", type);
     }
 };
