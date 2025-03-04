@@ -17,7 +17,7 @@ export class Tick {
         this.fadeout = false;
     }
     private setClassNames() {
-        const timingWindows = tickPoolCache.timingWindows as Record<string, number>;
+        const timingWindows = tickPoolCache.timingWindows;
         for (const [grade, range] of Object.entries(timingWindows)) {
             const hitError = Math.abs(this.position >> 1); // this.position will always be a multiple of 2, check setActive method
             this.classNames += hitError <= range ? `tick _${grade}` : "tick _0";
@@ -56,14 +56,15 @@ export class Tick {
 
 const POOL_SIZE = 200;
 export class TickPool {
-    pool: (Tick | null)[];
+    pool: (Tick)[];
     constructor() {
         this.pool = new Array(POOL_SIZE);
     }
-    // initialize pool with POOL_SIZE ticks
-    init() {
-        const freeTick = new Tick();
-        this.pool.fill(freeTick, 0, POOL_SIZE - 1);
+    // initialize and reset pool
+    set() {
+        for (let i = 0; i < POOL_SIZE; i++) {
+            this.pool[i] = new Tick();
+        }
     }
     // update pool with hit errors (array)
     update(hitErrors: number[]) {
@@ -89,10 +90,5 @@ export class TickPool {
                 tick?.setActive(hitError);
             }
         }
-    }
-
-    // reset the pool
-    reset() {
-        this.pool.fill(null, 0, POOL_SIZE - 1);
     }
 }

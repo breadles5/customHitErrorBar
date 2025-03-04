@@ -1,4 +1,5 @@
 import type { Settings } from "../sockets/types";
+import { getElement } from "./elements";
 
 // Initialize empty settings object with defaults to avoid undefined checks
 export const settings: Settings = {
@@ -49,8 +50,8 @@ export const updateSettings = (message: Partial<Settings>) => {
     let hasLayoutChanges = false;
 
     for (const [key, value] of Object.entries(message)) {
-        if (Object.prototype.hasOwnProperty.call(settings, key) && settings[key as keyof Settings] !== value) {
-            settings[key as keyof Settings] = value as never;
+        if (Object.prototype.hasOwnProperty.call(settings, key) && settings[<keyof Settings> key] !== value) {
+            settings[<keyof Settings> key] = <never> value;
 
             // Track what kind of changes occurred
             if (key.startsWith("color") || key === "TimingWindowOpacity") {
@@ -125,7 +126,7 @@ const updateCSSColors = () => {
 };
 
 export const updateVisibility = () => {
-    const sd = document.querySelector(".sd") as HTMLElement | null;
+    const sd = getElement(".sd");
     if (sd) {
         sd.style.display = settings.showSD ? "block" : "none";
     }

@@ -1,7 +1,8 @@
 import WebSocketManager from "./sockets/socket.js";
-import type { Settings, Tick, WEBSOCKET_V2, WEBSOCKET_V2_PRECISE } from "./sockets/types.ts";
+import type { Settings, WEBSOCKET_V2, WEBSOCKET_V2_PRECISE } from "./sockets/types.ts";
+import type { Tick } from "./workers/ticks/tickPool";
 import { settings, updateSettings } from "./utils/settings.js";
-import { clearSD, elements, updateTimingWindowElements, setHidden, setVisible } from "./utils/elements.ts";
+import { clearSD, updateTimingWindowElements, setHidden, setVisible, elementCache, getAllElements } from "./utils/elements.ts";
 import { calculateModTimingWindows } from "./utils/timingWindows.ts";
 import { renderTicks, clearTicks } from "./utils/ticks.ts";
 import { resetArrow, updateArrow } from "./utils/arrow.ts";
@@ -30,22 +31,20 @@ interface cache {
     mods: string;
     od: number;
     state: string;
-    statistics: Record<string, number>;
-    timingWindows: Record<string, number>;
+    statistics: Map<PropertyKey, number>;
+    timingWindows: Map<PropertyKey, number>;
     tickPool: Tick[];
     isReset: boolean; // for state check
     isUIreset: boolean; // for hit error array check
 }
-export const cache = {
+// TODO: convert to a map.
+export const cache: cache = {
     mode: "",
     mods: "", // mod names concatenated as string
     od: 0,
     state: "",
-    statistics: {
-        averageError: 0,
-        standardDeviationError: 0,
-    },
-    timingWindows: {},
+    statistics: new Map<string, number>(),
+    timingWindows: new Map<string, number>(),
     tickPool: [],
     isReset: true,
     isUIreset: true,
@@ -63,14 +62,18 @@ const resetUI = () => {
 const reset = () => {
     resetUI();
     cache.tickPool = [];
-    cache.statistics = { averageError: 0, standardDeviationError: 0 };
+    cache.statistics = new Map<string, number>([
+        ["averageError", 0],
+        ["standardDeviationError", 0],
+    ]);
+
     ticksWorker.postMessage({ type: "reset" });
     statisticsWorker.postMessage({ type: "reset" });
     console.log("[Main] reset");
 };
 
 // Initialize WebSocket connection
-wsManager.sendCommand("getSettings", encodeURI(window.COUNTER_PATH as string));
+wsManager.sendCommand("getSettings",encodeURI(<string> window.COUNTER_PATH));
 
 wsManager.commands((data: CommandData) => {
     try {
@@ -107,7 +110,6 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
             // reminder: following is executed only on state change
             console.log(`[GameState] State change: ${cache.state} to: ${data.state.name}`);
             cache.state = data.state.name;
-
             // Show elements during playing
             if (cache.state === "play") {
                 setVisible();
@@ -126,20 +128,19 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
                 cache.isReset = true;
                 cache.isUIreset = true;
             }
-        }
+            // Update gamemode and OD
+            const modeChanged: boolean = cache.mode !== data.play.mode.name;
+            const odChanged: boolean = cache.od !== data.beatmap.stats.od.original;
+            const modsChanged: boolean = cache.mods !== data.play.mods.name;
 
-        // Update gamemode and OD
-        const modeChanged: boolean = cache.mode !== data.play.mode.name;
-        const odChanged: boolean = cache.od !== data.beatmap.stats.od.original;
-        const modsChanged: boolean = cache.mods !== data.play.mods.name;
-
-        if (modeChanged || odChanged || modsChanged) {
-            cache.mode = data.play.mode.name;
-            cache.od = data.beatmap.stats.od.original;
-            cache.mods = data.play.mods.name;
-            cache.timingWindows = calculateModTimingWindows(cache.mode, cache.od, cache.mods);
-            // Update timing windows when parameters change
-            console.log("[Main] recalculated timing windows");
+            if (modeChanged || odChanged || modsChanged) {
+                cache.mode = data.play.mode.name;
+                cache.od = data.beatmap.stats.od.original;
+                cache.mods = data.play.mods.name;
+                cache.timingWindows = calculateModTimingWindows(cache.mode, cache.od, cache.mods);
+                // Update timing windows when parameters change
+                console.log("[Main] recalculated timing windows");
+            }
         }
     } catch (error) {
         console.error("[MESSAGE_ERROR] Error processing WebSocket message:", error);
@@ -152,26 +153,32 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
         const hits = data.hitErrors ?? [];
 
         if (hits.length === 0) {
-            // fixes UI retention upon restarting the map
             if (!cache.isUIreset) {
                 resetUI();
-                cache.isUIreset = true; // prevents resetting the UI on the next callback
+                cache.isUIreset = true;
             }
         } else {
             if (cache.state === "play") {
                 ticksWorker.postMessage({ type: "update", data: hits });
                 statisticsWorker.postMessage({ type: "update", data: cache.tickPool });
-                // recieve tick pool and statistics from workers
-                // not comparing the received data to the cache since comparison is done in the worker to determine if message should be sent to main thread
+
                 ticksWorker.onmessage = (event) => {
+                    const divs = getAllElements("div");
+                    if (divs) {
+                        elementCache.set("divs", divs);
+                    }
                     cache.tickPool = event.data;
                     renderTicks(cache.tickPool);
                 };
+
                 statisticsWorker.onmessage = (event) => {
-                    cache.statistics = event.data;
-                    updateArrow(cache.statistics.averageError);
-                    if (elements.sd) {
-                        elements.sd.textContent = cache.statistics.standardDeviationError.toFixed(2);
+                    // Convert the received object back to a Map
+                    cache.statistics = new Map(Object.entries(event.data));
+                    const averageError = cache.statistics.get("averageError") ?? 0;
+                    updateArrow(averageError);
+                    if (elementCache.has("sd")) {
+                        const sdElement = <HTMLElement> elementCache.get("sd");
+                        sdElement.innerHTML = (cache.statistics.get("standardDeviationError") ?? 0).toFixed(2);
                     }
                 };
             }

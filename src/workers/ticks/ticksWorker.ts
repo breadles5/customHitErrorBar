@@ -1,16 +1,16 @@
 import { TickPool } from "./tickPool.ts";
 
-let tickPool: TickPool | null = null;
+const tickPool = new TickPool();
 
 interface TickPoolCache {
     localHitErrors: number[];
-    timingWindows: Record<string, number>;
+    timingWindows: Map<PropertyKey, number>;
     timedOutHits: number;
     processedHits: number;
 }
 export let tickPoolCache: TickPoolCache = {
     localHitErrors: [],
-    timingWindows: {},
+    timingWindows: new Map<PropertyKey, number>(),
     timedOutHits: 0,
     processedHits: 0,
 };
@@ -19,27 +19,29 @@ self.onmessage = (event) => {
     const { type, data } = event.data;
     switch (type) {
         case "update":
-            if (tickPool) {
-                tickPool.update(data.hitErrors); // continues updating the pool, but only posts the updated pool
-                if (tickPoolCache.localHitErrors !== data.hitErrors) {
-                    tickPoolCache.localHitErrors = data.hitErrors;
-                    postMessage(tickPool.pool);
-                }
-                console.log("[Tick Worker] tickPool updated");
+            // data is the hit errors array directly
+            tickPool.update(data);
+            if (tickPoolCache.localHitErrors !== data) {
+                tickPoolCache.localHitErrors = data;
+                postMessage(tickPool.pool);
             }
             break;
         case "init":
-            tickPool = new TickPool();
-            tickPool.init();
+            tickPool.set();
             // only timing windows are being sent to the worker
             tickPoolCache.timingWindows = data;
             console.log("[Tick Worker] tickPool initialized");
             break;
         case "reset":
             if (tickPool) {
-                tickPool.reset();
+                tickPool.set();
             }
-            tickPoolCache = { localHitErrors: [], timingWindows: {}, timedOutHits: 0, processedHits: 0 };
+            tickPoolCache = {
+                localHitErrors: [],
+                timingWindows: new Map<PropertyKey, number>(),
+                timedOutHits: 0,
+                processedHits: 0,
+            };
             console.log("[Tick Worker] tickPool reset");
             break;
     }

@@ -3,40 +3,18 @@ import { cache } from "../index.ts";
 // DOM elements with memoization
 export const elementCache = new Map<string, HTMLElement | NodeListOf<HTMLElement>>();
 
-const getElement = (selector: string): HTMLElement | null => {
+export const getElement = (selector: string): HTMLElement | null => {
     if (!elementCache.has(selector)) {
-        elementCache.set(selector, document.querySelector(selector) as HTMLElement);
+        elementCache.set(selector, <HTMLElement> document.querySelector(selector));
     }
-    return elementCache.get(selector) as HTMLElement | null;
+    return <HTMLElement | null> elementCache.get(selector);
 };
 
-const getAllElements = (selector: string): NodeListOf<HTMLElement> | null => {
+export const getAllElements = (selector: string): NodeListOf<HTMLElement> | null => {
     if (!elementCache.has(selector)) {
-        elementCache.set(selector, document.querySelectorAll(selector) as NodeListOf<HTMLElement>);
+        elementCache.set(selector, <NodeListOf<HTMLElement>> document.querySelectorAll(selector));
     }
-    return elementCache.get(selector) as NodeListOf<HTMLElement> | null;
-};
-
-// Export cached DOM elements
-export const elements = {
-    get tickContainer(): HTMLElement | null {
-        return getElement(".tick-container");
-    },
-    get arrow(): HTMLElement | null {
-        return getElement(".arrow");
-    },
-    get allDivs(): NodeListOf<HTMLElement> | null {
-        return getAllElements("div");
-    },
-    get sd(): HTMLElement | null {
-        return getElement(".sd");
-    },
-    get colorsContainer(): HTMLElement | null {
-        return getElement(".colors-container");
-    },
-    get bar(): HTMLElement | null {
-        return getElement(".bar");
-    },
+    return <NodeListOf<HTMLElement> | null> elementCache.get(selector);
 };
 
 // Clear cache on page unload
@@ -44,22 +22,23 @@ window.addEventListener("unload", () => {
     elementCache.clear();
 });
 
-export const setHidden = () => elements.allDivs?.forEach((div) => div.classList.add("hidden"));
-export const setVisible = () => elements.allDivs?.forEach((div) => div.classList.remove("hidden"));
+export const setHidden = () => getAllElements("div")?.forEach((div) => div.classList.add("hidden"));
+export const setVisible = () => getAllElements("div")?.forEach((div) => div.classList.remove("hidden"));
 
 // Add hidden class to all elements by default
 setHidden();
 
 export const clearSD = (): void => {
-    if (elements.sd) {
-        elements.sd.textContent = "0.00";
+    const sd = getElement(".sd");
+    if (sd) {
+        sd.textContent = "0.00";
     }
-}
+};
 
 // Update timing window display in the DOM
 export async function updateTimingWindowElements() {
-    const timingWindows = cache.timingWindows as { [key: string]: number };
-    const colorsContainer = document.querySelector(".colors-container");
+    const timingWindows = cache.timingWindows;
+    const colorsContainer = getElement(".colors-container");
     console.log("Timing windows:", timingWindows);
 
     // Clear existing timing windows
@@ -68,7 +47,7 @@ export async function updateTimingWindowElements() {
     }
 
     // Set container widths based on miss window (0)
-    const containerWidth = Math.abs(timingWindows[0] * 4);
+    const containerWidth = Math.abs(timingWindows.get("0") ?? 0) * 4;
     document.documentElement.style.setProperty("--container-width", `${containerWidth}px`);
 
     // Helper function to create timing window element
@@ -85,7 +64,7 @@ export async function updateTimingWindowElements() {
     const timingWindowGrades = cache.mode === "mania" ? maniaTimingWindowGrades : otherTimingWindowGrades;
 
     timingWindowGrades.forEach((grade) => {
-        const width = timingWindows[grade];
+        const width = timingWindows.get(grade) ?? 0;
         colorsContainer?.appendChild(createTimingWindow(String(grade), width));
     });
 }

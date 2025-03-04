@@ -1,4 +1,4 @@
-import { elements } from "./elements";
+import { getElement } from "./elements";
 import { settings } from "./settings";
 
 // Animation functions
@@ -15,15 +15,17 @@ const getArrowColor = (average: number): string => {
 };
 
 export function updateArrow(targetPosition: number) {
-    if (elements.arrow) {
-        elements.arrow.style.transform = `translateX(${targetPosition}px)`;
-        elements.arrow.style.borderTopColor = getArrowColor(targetPosition);
+    const arrow = getElement(".arrow");
+    if (arrow) {
+        arrow.style.transform = `translateX(${targetPosition}px)`;
+        arrow.style.borderTopColor = getArrowColor(targetPosition);
     }
 }
 
 export function resetArrow() {
-    if (elements.arrow) {
-        elements.arrow.style.transform = "translateX(0px)";
-        elements.arrow.style.borderTopColor = "#fff";
+    const arrow = getElement(".arrow");
+    if (arrow) {
+        arrow.style.transform = "translateX(0px)";
+        arrow.style.borderTopColor = "#fff";
     }
 }
