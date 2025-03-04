@@ -52,6 +52,13 @@ export class Tick {
         tickPoolCache.timedOutHits++;
         tickPoolCache.processedHits++;
     }
+    reset() {
+        this.position = 0;
+        this.active = false;
+        this.timestamp = Date.now();
+        this.classNames = "tick inactive";
+        this.fadeout = false;
+    }
 }
 
 const POOL_SIZE = 200;
@@ -62,8 +69,9 @@ export class TickPool {
     }
     // initialize and reset pool
     set() {
+        // reset pool, but preserves tick instances, mutating only their properties
         for (let i = 0; i < POOL_SIZE; i++) {
-            this.pool[i] = new Tick();
+            this.pool[i].reset();
         }
     }
     // update pool with hit errors (array)
