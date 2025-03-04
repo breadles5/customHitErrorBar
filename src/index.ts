@@ -37,7 +37,7 @@ interface cache {
     isReset: boolean; // for state check
     isUIreset: boolean; // for hit error array check
 }
-// TODO: convert to a map.
+// no need to convert to map, since keys are already known at compile/runtime.
 export const cache: cache = {
     mode: "",
     mods: "", // mod names concatenated as string
@@ -116,8 +116,8 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
                 updateTimingWindowElements();
                 cache.isReset = false;
                 cache.isUIreset = false;
-                ticksWorker.postMessage({ type: "init", data: cache.timingWindows });
-                statisticsWorker.postMessage({ type: "init" });
+                ticksWorker.postMessage({ type: "set", data: cache.timingWindows });
+                statisticsWorker.postMessage({ type: "set" });
             } else {
                 // Fade out elements when leaving gameplay
                 setHidden();
@@ -155,9 +155,6 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
         if (hits.length === 0) {
             if (!cache.isUIreset) {
                 resetUI();
-                cache.state === "play"
-                ? ticksWorker.postMessage({ type: "reset", data: cache.timingWindows })
-                : console.log("[Reset] no need to send timing windows to worker");
                 cache.isUIreset = true;
             }
         } else {
