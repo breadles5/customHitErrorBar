@@ -67,8 +67,8 @@ const reset = () => {
         ["standardDeviationError", 0],
     ]);
 
-    ticksWorker.postMessage({ type: "reset" });
-    statisticsWorker.postMessage({ type: "reset" });
+    ticksWorker.postMessage({ type: "set" });
+    statisticsWorker.postMessage({ type: "set" });
     console.log("[Main] reset");
 };
 
@@ -121,7 +121,7 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
             } else {
                 // Fade out elements when leaving gameplay
                 setHidden();
-                // Wait for fade out to complete before resettingW
+                // Wait for fade out to complete before resetting
                 setTimeout(() => {
                     reset();
                 }, settings.fadeOutDuration);
@@ -155,6 +155,9 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
         if (hits.length === 0) {
             if (!cache.isUIreset) {
                 resetUI();
+                cache.state === "play"
+                ? ticksWorker.postMessage({ type: "reset", data: cache.timingWindows })
+                : console.log("[Reset] no need to send timing windows to worker");
                 cache.isUIreset = true;
             }
         } else {

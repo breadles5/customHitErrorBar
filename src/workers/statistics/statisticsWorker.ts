@@ -1,12 +1,10 @@
 import { TickPool, type Tick } from "../ticks/tickPool.ts";
 import { average, standardDeviation } from "./helpers.ts";
 
-const statistics = new Map<string, number>(
-    Object.entries({
-        averageError: 0,
-        standardDeviationError: 0,
-    }),
-);
+const statistics = new Map<string, number>([
+    ["averageError", 0],
+    ["standardDeviationError", 0],
+]);
 
 let localTickPool = new TickPool();
 self.onmessage = (event) => {
@@ -24,18 +22,10 @@ self.onmessage = (event) => {
                 postMessage(Object.fromEntries(statistics));
             }
             break;
-        case "init":
-            postMessage({
-                type: "update",
-                data: { statistics },
-            });
-            console.log("[Statistics Worker] initialized");
-            break;
-        case "reset":
+        case "set":
+            localTickPool.set();
             statistics.set("averageError", 0);
             statistics.set("standardDeviationError", 0);
-            localTickPool.reset();
-            postMessage(Object.fromEntries(statistics));
             console.log("[Statistics Worker] reset statistics");
             break;
         default:
