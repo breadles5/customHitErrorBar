@@ -12,8 +12,8 @@
     },
     "devDependencies": {
         "@biomejs/biome": "^1.9.4",
-        "@types/node": "^22.10.5",
-        "globals": "^15.12.0",
-        "vite": "^6.0.7"
+        "@types/node": "^22.13.9",
+        "globals": "^15.15.0",
+        "vite": "^6.2.0"
     }
 }
