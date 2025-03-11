@@ -37,7 +37,7 @@ const root = typeof document !== "undefined" ? document.documentElement : { styl
 let lastWindowHeight = 0;
 let lastRoundedPercent = 0;
 
-export function getSettings() {
+export const getSettings = () => {
     return settings;
 }
 
@@ -50,8 +50,8 @@ export const updateSettings = (message: Partial<Settings>) => {
     let hasLayoutChanges = false;
 
     for (const [key, value] of Object.entries(message)) {
-        if (Object.prototype.hasOwnProperty.call(settings, key) && settings[<keyof Settings> key] !== value) {
-            settings[<keyof Settings> key] = <never> value;
+        if (Object.prototype.hasOwnProperty.call(settings, key) && settings[<keyof Settings>key] !== value) {
+            settings[<keyof Settings>key] = <never>value;
 
             // Track what kind of changes occurred
             if (key.startsWith("color") || key === "TimingWindowOpacity") {

@@ -679,7 +679,7 @@ export interface WEBSOCKET_V2_PRECISE {
     hitErrors: number[];
     tourney: {
         ipcId: number;
-        hitErrors: number[];
+        hitErrors: Int16Array;
         keys: {
             k1: {
                 isPressed: boolean;
@@ -727,10 +727,10 @@ export interface Settings {
     visible: boolean;
 }
 
-export interface Tick {
-    position: number;
-    active: boolean;
-    fadeout: boolean;
-    timestamp: number; // timestamp in milliseconds
-    classNames: string;
-}
+// export interface Tick {
+//     position: number;
+//     active: boolean;
+//     fadeout: boolean;
+//     timestamp: number; // timestamp in milliseconds
+//     classNames: string;
+// }

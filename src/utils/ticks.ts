@@ -1,12 +1,9 @@
-import type { Tick } from "../workers/ticks/tickPool";
-import { elementCache, getElement } from "./elements";
+import type { Tick } from "../workers/shared/types";
+import { getElement } from "./elements";
 
 export function renderTicks(tickPool: Tick[]): void {
     const container = getElement(".tick-container");
     if (!container) return;
-
-    // Clear existing ticks first
-    clearTicks();
 
     const fragment = document.createDocumentFragment();
     for (const tick of tickPool) {
@@ -23,7 +20,7 @@ export function renderTicks(tickPool: Tick[]): void {
     fragment.appendChild(bar);
 
     container.appendChild(fragment);
-    console.log("[DOM] Ticks rendered");
+    // console.log("[DOM] Ticks rendered");
 }
 
 export function clearTicks(): void {
@@ -31,5 +28,5 @@ export function clearTicks(): void {
     if (container) {
         container.innerHTML = "";
     }
-    console.log("[DOM] Ticks cleared");
+    // console.log("[DOM] Ticks cleared");
 }

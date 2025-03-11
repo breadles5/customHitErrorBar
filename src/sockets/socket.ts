@@ -80,7 +80,7 @@ class WebSocketManager {
             return json;
         } catch (error) {
             console.error(error);
-            return { error: ( <Error> error ).message };
+            return { error: (<Error>error).message };
         }
     }
 
@@ -93,7 +93,7 @@ class WebSocketManager {
             return text;
         } catch (error) {
             console.error(error);
-            return { error: ( <Error> error ).message };
+            return { error: (<Error>error).message };
         }
     }
 

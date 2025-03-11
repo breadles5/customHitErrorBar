@@ -1,20 +1,21 @@
 import { cache } from "../index.ts";
+import { clearTicks } from "./ticks.ts";
 
 // DOM elements with memoization
 export const elementCache = new Map<string, HTMLElement | NodeListOf<HTMLElement>>();
 
 export const getElement = (selector: string): HTMLElement | null => {
     if (!elementCache.has(selector)) {
-        elementCache.set(selector, <HTMLElement> document.querySelector(selector));
+        elementCache.set(selector, <HTMLElement>document.querySelector(selector));
     }
-    return <HTMLElement | null> elementCache.get(selector);
+    return <HTMLElement | null>elementCache.get(selector);
 };
 
 export const getAllElements = (selector: string): NodeListOf<HTMLElement> | null => {
     if (!elementCache.has(selector)) {
-        elementCache.set(selector, <NodeListOf<HTMLElement>> document.querySelectorAll(selector));
+        elementCache.set(selector, <NodeListOf<HTMLElement>>document.querySelectorAll(selector));
     }
-    return <NodeListOf<HTMLElement> | null> elementCache.get(selector);
+    return <NodeListOf<HTMLElement> | null>elementCache.get(selector);
 };
 
 // Clear cache on page unload
@@ -27,6 +28,7 @@ export const setVisible = () => getAllElements("div")?.forEach((div) => div.clas
 
 // Add hidden class to all elements by default
 setHidden();
+clearTicks();
 
 export const clearSD = (): void => {
     const sd = getElement(".sd");
@@ -36,7 +38,7 @@ export const clearSD = (): void => {
 };
 
 // Update timing window display in the DOM
-export async function updateTimingWindowElements() {
+export function updateTimingWindowElements() {
     const timingWindows = cache.timingWindows;
     const colorsContainer = getElement(".colors-container");
     console.log("Timing windows:", timingWindows);
@@ -58,13 +60,17 @@ export async function updateTimingWindowElements() {
         return div;
     };
 
-    // Add timing windows based on gamemode
-    const maniaTimingWindowGrades: string[] = ["300g", "200", "100", "50", "0"];
-    const otherTimingWindowGrades: string[] = ["300", "100", "50", "0"];
-    const timingWindowGrades = cache.mode === "mania" ? maniaTimingWindowGrades : otherTimingWindowGrades;
-
-    timingWindowGrades.forEach((grade) => {
-        const width = timingWindows.get(grade) ?? 0;
+    timingWindows.forEach((width, grade) => {
         colorsContainer?.appendChild(createTimingWindow(String(grade), width));
     });
+
+    // // Add timing windows based on gamemode
+    // const maniaTimingWindowGrades: string[] = ["300g", "200", "100", "50", "0"];
+    // const otherTimingWindowGrades: string[] = ["300", "100", "50", "0"];
+    // const timingWindowGrades = cache.mode === "mania" ? maniaTimingWindowGrades : otherTimingWindowGrades;
+
+    // timingWindowGrades.forEach((grade) => {
+    //     const width = timingWindows.get(grade) ?? 0;
+    //     colorsContainer?.appendChild(createTimingWindow(String(grade), width));
+    // });
 }
