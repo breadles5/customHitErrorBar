@@ -30,7 +30,7 @@ export class TickImpl implements Tick {
     fadeout: boolean;
     timestamp: number; // timestamp in milliseconds
     classNames: string;
-
+    // id: string;
     constructor() {
         this.position = 0;
         this.active = false;
@@ -38,6 +38,7 @@ export class TickImpl implements Tick {
         // initialize class names and fadeout
         this.classNames = "tick";
         this.fadeout = false;
+        // this.id = `${id}`;
     }
     private setClassNames() {
         const timingWindows = tickPoolCache.timingWindows;
@@ -115,8 +116,8 @@ const POOL_SIZE = 200;
 export class TickPool {
     pool: TickImpl[];
     constructor() {
-        // Initialize with explicit TickImpl instances
-        this.pool = Array.from({ length: POOL_SIZE }, () => new TickImpl());
+        // Initialize with explicit TickImpl instances and sequential IDs
+        this.pool = Array.from({ length: POOL_SIZE }, (_, index) => new TickImpl());
     }
     
     set() {

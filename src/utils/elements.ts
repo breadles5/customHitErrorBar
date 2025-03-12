@@ -1,5 +1,5 @@
 import { cache } from "../index.ts";
-import { clearTicks } from "./ticks.ts";
+import { renderTicksOnLoad } from "./ticks.ts";
 
 // DOM elements with memoization
 export const elementCache = new Map<string, HTMLElement | NodeListOf<HTMLElement>>();
@@ -28,7 +28,7 @@ export const setVisible = () => getAllElements("div")?.forEach((div) => div.clas
 
 // Add hidden class to all elements by default
 setHidden();
-clearTicks();
+renderTicksOnLoad
 
 export const clearSD = (): void => {
     const sd = getElement(".sd");
@@ -41,7 +41,6 @@ export const clearSD = (): void => {
 export function updateTimingWindowElements() {
     const timingWindows = cache.timingWindows;
     const colorsContainer = getElement(".colors-container");
-    console.log("Timing windows:", timingWindows);
 
     // Clear existing timing windows
     if (colorsContainer) {
@@ -63,14 +62,4 @@ export function updateTimingWindowElements() {
     timingWindows.forEach((width, grade) => {
         colorsContainer?.appendChild(createTimingWindow(String(grade), width));
     });
-
-    // // Add timing windows based on gamemode
-    // const maniaTimingWindowGrades: string[] = ["300g", "200", "100", "50", "0"];
-    // const otherTimingWindowGrades: string[] = ["300", "100", "50", "0"];
-    // const timingWindowGrades = cache.mode === "mania" ? maniaTimingWindowGrades : otherTimingWindowGrades;
-
-    // timingWindowGrades.forEach((grade) => {
-    //     const width = timingWindows.get(grade) ?? 0;
-    //     colorsContainer?.appendChild(createTimingWindow(String(grade), width));
-    // });
 }

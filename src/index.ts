@@ -1,6 +1,5 @@
 import WebSocketManager from "./sockets/socket";
 import type { Settings, WEBSOCKET_V2, WEBSOCKET_V2_PRECISE } from "./sockets/types";
-import type { Tick } from "./workers/shared/types";
 import { settings, updateSettings, getSettings } from "./utils/settings";
 import {
     clearSD,
@@ -11,10 +10,11 @@ import {
     getAllElements,
 } from "./utils/elements";
 import { calculateModTimingWindows } from "./utils/timingWindows";
-import { renderTicks, clearTicks } from "./utils/ticks";
+import { renderTicksOnLoad, rerenderTicks } from "./utils/ticks";
 import { resetArrow, updateArrow } from "./utils/arrow";
 import { TickPool } from "./workers/shared/tickPool";
 
+window?.addEventListener("load", renderTicksOnLoad);
 interface WebSocketCommandMessage extends Partial<Settings> {
     error?: string;
     websocketUrl?: string;
@@ -33,7 +33,6 @@ const ticksWorker = new Worker(new URL("./workers/ticks/ticksWorker", import.met
 const statisticsWorker = new Worker(new URL("./workers/statistics/statisticsWorker", import.meta.url), {
     type: "module",
 });
-
 interface cache {
     mode: string;
     mods: string;
@@ -65,7 +64,7 @@ export const cache: cache = {
 const resetUI = () => {
     clearSD();
     resetArrow();
-    clearTicks();
+    rerenderTicks();
     console.log("[Main] reset UI");
 };
 
@@ -192,7 +191,7 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
                 }
                 cache.tickPool.pool = event.data;
                 // console.log(cache.tickPool.pool)
-                renderTicks(cache.tickPool.pool);
+                rerenderTicks();
             };
 
             statisticsWorker.onmessage = (event) => {

@@ -1,32 +1,59 @@
-import type { Tick } from "../workers/shared/types";
 import { getElement } from "./elements";
+import { cache } from "../index";
+import { TickPool } from "../workers/shared/tickPool";
 
-export function renderTicks(tickPool: Tick[]): void {
-    const container = getElement(".tick-container");
-    if (!container) return;
-
-    const fragment = document.createDocumentFragment();
-    for (const tick of tickPool) {
-        const div = document.createElement("div");
-        const { position, classNames } = tick;
-        div.className = classNames;
-        div.style.transform = `translateX(${position}px)`;
-        fragment.appendChild(div);
-    }
-
-    // Add the bar back
-    const bar = document.createElement("div");
-    bar.className = "bar";
-    fragment.appendChild(bar);
-
-    container.appendChild(fragment);
-    // console.log("[DOM] Ticks rendered");
+interface TickRender{
+    classNames: string;
+    position: number;
 }
 
-export function clearTicks(): void {
+
+export const renderTicksOnLoad = (): void => {
     const container = getElement(".tick-container");
-    if (container) {
-        container.innerHTML = "";
+    if (!container) return;
+    const fragment = document.createDocumentFragment();
+    for (let i = 0; i < cache.tickPool.pool.length; i++) {
+        const div = document.createElement("div");
+        div.id = `${i}`;
+        div.className = "tick inactive";
+        fragment.appendChild(div);
     }
-    // console.log("[DOM] Ticks cleared");
+    container.appendChild(fragment);
+}
+
+
+// TODO: check tempTickPool ticks against cache.tickPool.pool ticks, if they share classNmaes or positions, dont rerender, otherwise, change only the position and className
+let tempTickPool = new TickPool();
+export const rerenderTicks = (): void => {
+    for (let i = 0; i < tempTickPool.pool.length; i++) {
+        const tempTick: TickRender = tempTickPool.pool[i];
+        const tick = cache.tickPool.pool[i];
+        const tickElement = document.getElementById(`${i}`); // i should be equal to tick.id
+        if (!tickElement) return;
+        
+        if (tempTick.classNames !== tick.classNames) {
+            tempTick.classNames = tick.classNames;
+            tickElement.className = tempTick.classNames;
+            console.log("[tick ${i}] className changed to ${tempTick.classNames}");
+        }
+
+        if (tempTick.position !== tick.position) {
+            tempTick.position = tick.position;
+            tickElement.style.transform = `translateX(${tempTick.position}px)`;
+            console.log("[tick ${i}] position changed to ${tempTick.position}");
+        }
+    }
+    // const container = getElement(".tick-container");
+    // if (!container) return;
+
+    // const fragment = document.createDocumentFragment();
+    // for (const tick of cache.tickPool.pool) {
+    //     const div = document.createElement("div");
+    //     const { position, classNames } = tick;
+    //     div.className = classNames;
+    //     div.style.transform = `translateX(${position}px)`;
+    //     fragment.appendChild(div);
+    // }
+    // container.appendChild(fragment);
+    // // console.log("[DOM] Ticks rendered");
 }
