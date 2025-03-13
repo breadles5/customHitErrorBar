@@ -81,9 +81,9 @@ const reset = () => {
     console.log("[Main] reset");
 };
 
-setInterval(() => {
-    console.log(cache.tickPool.pool);
-}, 10000);
+// setInterval(() => {
+//     console.log(cache.tickPool.pool);
+// }, 10000);
 
 // Initialize WebSocket connection
 wsManager.sendCommand("getSettings", encodeURI(<string>window.COUNTER_PATH));
@@ -195,9 +195,7 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
             };
 
             statisticsWorker.onmessage = (event) => {
-                const { data } = event.data;
-                cache.statistics = data;
-                console.log(cache.statistics);
+                cache.statistics = <Record<PropertyKey, number>>event.data;
                 const averageError = cache.statistics.averageError;
                 updateArrow(averageError);
                 if (elementCache.has("sd")) {
