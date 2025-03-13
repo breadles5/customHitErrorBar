@@ -178,7 +178,7 @@ body {
     z-index: 7;
 }
 
-.tick.fade-out {
+.tick.fadeout {
     opacity: 0;
     pointer-events: none;
 }
