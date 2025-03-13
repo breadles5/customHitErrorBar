@@ -17,7 +17,8 @@ const getArrowColor = (average: number): string => {
 export function updateArrow(targetPosition: number) {
     const arrow = getElement(".arrow");
     if (arrow) {
-        arrow.style.transform = `translateX(${targetPosition}px)`;
+        // should allow for gpu acceleration?s
+        arrow.style.transform = `translate3d(${targetPosition}px, 0, 0)`;
         arrow.style.borderTopColor = getArrowColor(targetPosition);
     }
 }

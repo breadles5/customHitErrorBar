@@ -39,7 +39,8 @@ export const rerenderTicks = (): void => {
 
         if (tempTick.position !== tick.position) {
             tempTick.position = tick.position;
-            tickElement.style.transform = `translateX(${tempTick.position}px)`;
+            // should allow for gpu acceleration
+            tickElement.style.transform = `translate3d(${tempTick.position}px, 0, 0)`;
             // console.log("[tick ${i}] position changed to ${tempTick.position}");
         }
     }
