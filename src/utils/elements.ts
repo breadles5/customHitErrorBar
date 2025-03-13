@@ -28,7 +28,6 @@ export const setVisible = () => getAllElements("div")?.forEach((div) => div.clas
 
 // Add hidden class to all elements by default
 setHidden();
-renderTicksOnLoad
 
 export const clearSD = (): void => {
     const sd = getElement(".sd");

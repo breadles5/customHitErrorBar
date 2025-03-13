@@ -122,6 +122,27 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
             console.log(`[GameState] State change: ${cache.state} to: ${data.state.name}`);
             cache.state = data.state.name;
             
+            const modeChanged: boolean = cache.mode !== data.play.mode.name;
+            const odChanged: boolean = cache.od !== data.beatmap.stats.od.original;
+            const modsChanged: boolean = cache.mods !== data.play.mods.name;
+
+            if (modeChanged || odChanged || modsChanged) {
+                cache.mode = data.beatmap.mode.name;
+                cache.od = data.beatmap.stats.od.original;
+                cache.mods = data.play.mods.name;
+                cache.timingWindows = calculateModTimingWindows(cache.mode, cache.od, cache.mods);
+                console.log("[Main] recalculated timing windows:", Array.from(cache.timingWindows.entries()));
+                
+                // Send updated timing windows to worker
+                ticksWorker.postMessage({ 
+                    type: "set", 
+                    data: {
+                        timingWindows: cache.timingWindows, 
+                        settings: getSettings()
+                    } 
+                });
+            }
+            
             if (cache.state === "play") {
                 setVisible();
                 updateTimingWindowElements();
@@ -144,26 +165,6 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
                 }, settings.fadeOutDuration);
             }
 
-            const modeChanged: boolean = cache.mode !== data.play.mode.name;
-            const odChanged: boolean = cache.od !== data.beatmap.stats.od.original;
-            const modsChanged: boolean = cache.mods !== data.play.mods.name;
-
-            if (modeChanged || odChanged || modsChanged) {
-                cache.mode = data.beatmap.mode.name;
-                cache.od = data.beatmap.stats.od.original;
-                cache.mods = data.play.mods.name;
-                cache.timingWindows = calculateModTimingWindows(cache.mode, cache.od, cache.mods);
-                console.log("[Main] recalculated timing windows:", Array.from(cache.timingWindows.entries()));
-                
-                // Send updated timing windows to worker
-                ticksWorker.postMessage({ 
-                    type: "set", 
-                    data: {
-                        timingWindows: cache.timingWindows, 
-                        settings: getSettings()
-                    } 
-                });
-            }
         }
     } catch (error) {
         console.error("[MESSAGE_ERROR] Error processing WebSocket message:", error);
@@ -190,12 +191,10 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
                     elementCache.set("divs", divs);
                 }
                 cache.tickPool.pool = event.data;
-                // console.log(cache.tickPool.pool)
                 rerenderTicks();
             };
 
             statisticsWorker.onmessage = (event) => {
-                // Convert the received object back to a Map
                 cache.statistics = event.data;
                 const averageError = cache.statistics.averageError;
                 updateArrow(averageError);

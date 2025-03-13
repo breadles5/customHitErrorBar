@@ -1,6 +1,9 @@
 import type { Settings } from "../sockets/types";
 import { getElement } from "./elements";
-
+/*
+    lets agree to never touch this file again
+    it's a mess
+*/
 // Initialize empty settings object with defaults to avoid undefined checks
 export const settings: Settings = {
     TimingWindowOpacity: 0,
@@ -28,9 +31,7 @@ export const settings: Settings = {
     showSD: true,
     visible: true,
 };
-
-// Cache DOM element
-// damn shit runs in browser, but dev server doesn't know what the fuck document is since it's not a browser (its a node js environment)
+// define root element
 const root = typeof document !== "undefined" ? document.documentElement : { style: { setProperty: () => {} } };
 
 // Cache calculated values

@@ -4,7 +4,6 @@ export interface Tick {
     fadeout: boolean;
     timestamp: number;
     classNames: string;
-    // id: string;
     setActive(hitError: number): void;
     setFadeout(): void;
     setInactive(): void;

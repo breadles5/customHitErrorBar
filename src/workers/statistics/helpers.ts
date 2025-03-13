@@ -1,9 +1,9 @@
-export function average(arr: number[]): number {
+export const average = (arr: number[]): number => {
     if (!arr || arr.length === 0) return 0;
     return arr.reduce((a, b) => a + b, 0) / arr.length;
 }
 
-export function standardDeviation(arr: number[]): number {
+export const standardDeviation = (arr: number[]): number => {
     if (!arr || arr.length === 0) return 0;
     const avg = average(arr);
     const squareDiffs = arr.map((value) => {
