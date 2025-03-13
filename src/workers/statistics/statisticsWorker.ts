@@ -11,10 +11,11 @@ self.onmessage = (event) => {
     switch (type) {
         case "update": {
             const ticks = data.filter((tick: Tick) => tick?.active);
-            const errors: number[] = ticks.map((tick: Tick) => tick?.position >> 1);
+            const errors: number[] = ticks.map((tick: Tick) => tick.position >> 1);
+            const classNamesArray = data.map((tick: Tick) => tick.classNames);
             statistics.averageError = average(errors);
-            statistics.standardDeviationError = standardDeviation(errors) 
-            postMessage({type: "update", data: statistics});
+            statistics.standardDeviationError = standardDeviation(errors)
+            postMessage({data: statistics});
             break;
         }
         case "set":

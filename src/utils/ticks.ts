@@ -34,26 +34,13 @@ export const rerenderTicks = (): void => {
         if (tempTick.classNames !== tick.classNames) {
             tempTick.classNames = tick.classNames;
             tickElement.className = tempTick.classNames;
-            console.log("[tick ${i}] className changed to ${tempTick.classNames}");
+            // console.log("[tick ${i}] className changed to ${tempTick.classNames}");
         }
 
         if (tempTick.position !== tick.position) {
             tempTick.position = tick.position;
             tickElement.style.transform = `translateX(${tempTick.position}px)`;
-            console.log("[tick ${i}] position changed to ${tempTick.position}");
+            // console.log("[tick ${i}] position changed to ${tempTick.position}");
         }
     }
-    // const container = getElement(".tick-container");
-    // if (!container) return;
-
-    // const fragment = document.createDocumentFragment();
-    // for (const tick of cache.tickPool.pool) {
-    //     const div = document.createElement("div");
-    //     const { position, classNames } = tick;
-    //     div.className = classNames;
-    //     div.style.transform = `translateX(${position}px)`;
-    //     fragment.appendChild(div);
-    // }
-    // container.appendChild(fragment);
-    // // console.log("[DOM] Ticks rendered");
 }

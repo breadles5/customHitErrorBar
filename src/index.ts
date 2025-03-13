@@ -195,7 +195,9 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
             };
 
             statisticsWorker.onmessage = (event) => {
-                cache.statistics = event.data;
+                const { data } = event.data;
+                cache.statistics = data;
+                console.log(cache.statistics);
                 const averageError = cache.statistics.averageError;
                 updateArrow(averageError);
                 if (elementCache.has("sd")) {
