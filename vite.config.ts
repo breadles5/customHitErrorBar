@@ -1,12 +1,13 @@
 import { defineConfig } from "vite";
-import { resolve, dirname } from "node:path";
+import path, { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import fs from "node:fs";
+import { ConfigEnv } from "vite";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 // Function to copy files to dist
-const copyFile = (src, dest) => {
+const copyFile = (src: string, dest: string) => {
     try {
         fs.copyFileSync(src, dest);
         console.log(`Copied ${src} to dist directory`);
@@ -15,15 +16,13 @@ const copyFile = (src, dest) => {
     }
 };
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
     build: {
-        // Output to dist directory
         emptyOutDir: true,
-        outDir: "../../dist.customHitErrorBar",
-        // Use esbuild for better minification
+        outDir: "dist",
         minify: "esbuild",
-        // Generate sourcemaps for debugging
-        sourcemap: false,
+        // Generate sourcemaps based on mode
+        sourcemap: mode === "development",
         // Configure rollup options
         rollupOptions: {
             input: {
@@ -38,18 +37,12 @@ export default defineConfig({
                 assetFileNames: "[name][extname]",
             },
         },
-
-        // Optimize dependencies
-        optimizeDeps: {
-            include: ["src/index.ts", "src/**/*.ts"],
-        },
-        // esbuild options for maximum minification
         target: "esnext",
         esbuild: {
             legalComments: "none",
             treeShaking: true,
-            minifyIdentifiers: true,
-            minifySyntax: true,
+            minifyIdentifiers: mode === "production",
+            minifySyntax: mode === "production",
             minifyWhitespace: true,
         },
     },
@@ -66,11 +59,11 @@ export default defineConfig({
         {
             name: "copy-assets",
             closeBundle() {
-                const files = ["metadata.txt", "settings.json"];
+                const files = ["metadata.txt", "settings.json", "README.md"];
 
                 files.forEach((file) => {
                     const src = resolve(__dirname, file);
-                    const dest = resolve(__dirname, "../../dist.customHitErrorBar", file);
+                    const dest = resolve(__dirname, "../../customHitErrorBar", file);
                     copyFile(src, dest);
                 });
             },
@@ -89,14 +82,5 @@ export default defineConfig({
                 assetFileNames: "[name][extname]",
             },
         },
-        // esbuild options for maximum minification
-        target: "esnext",
-        esbuild: {
-            legalComments: "none",
-            treeShaking: true,
-            minifyIdentifiers: true,
-            minifySyntax: true,
-            minifyWhitespace: true,
-        },
     },
-});
+}));
