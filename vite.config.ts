@@ -20,9 +20,9 @@ export default defineConfig(({ mode }) => ({
     build: {
         emptyOutDir: true,
         outDir: "dist",
-        minify: mode === "production" || mode === "development",
+        minify: mode.match(/production|development/) ? "esbuild" : false,
         // Generate sourcemaps based on mode
-        sourcemap: !mode.includes("ci"),
+        sourcemap: !mode.match(/ci|prod/),
         // Configure rollup options
         rollupOptions: {
             input: {
@@ -41,9 +41,9 @@ export default defineConfig(({ mode }) => ({
         esbuild: {
             legalComments: "none",
             treeShaking: true,
-            minifyIdentifiers: mode === "production" || mode === "development",
-            minifySyntax: mode === "production" || mode === "development",
-            minifyWhitespace: mode === "production" || mode === "development",
+            minifyIdentifiers: mode.match(/production|development/),
+            minifySyntax: mode.match(/production|development/),
+            minifyWhitespace: mode.match(/production|development/),
         },
     },
     // Base public path - important for worker loading
@@ -63,7 +63,7 @@ export default defineConfig(({ mode }) => ({
 
                 files.forEach((file) => {
                     const src = resolve(__dirname, file);
-                    const dest = resolve(__dirname, "../../customHitErrorBar", file);
+                    const dest = resolve(__dirname, "dist", file);
                     copyFile(src, dest);
                 });
             },
