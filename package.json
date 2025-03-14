@@ -7,6 +7,7 @@
     "scripts": {
         "build:prod": "vite build --mode production",
         "build:dev": "vite build --mode development",
+        "build:ci": "vite build --mode ci",
         "format": "biome format ./src --write",
         "lint": "biome lint ./src --write"
     },

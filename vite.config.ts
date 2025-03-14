@@ -20,9 +20,9 @@ export default defineConfig(({ mode }) => ({
     build: {
         emptyOutDir: true,
         outDir: "dist",
-        minify: mode === ("production"),
+        minify: mode === "production" || mode === "development",
         // Generate sourcemaps based on mode
-        sourcemap: mode === "development",
+        sourcemap: !mode.includes("ci"),
         // Configure rollup options
         rollupOptions: {
             input: {
@@ -41,9 +41,9 @@ export default defineConfig(({ mode }) => ({
         esbuild: {
             legalComments: "none",
             treeShaking: true,
-            minifyIdentifiers: mode === "production",
-            minifySyntax: mode === "production",
-            minifyWhitespace: mode === "production",
+            minifyIdentifiers: mode === "production" || mode === "development",
+            minifySyntax: mode === "production" || mode === "development",
+            minifyWhitespace: mode === "production" || mode === "development",
         },
     },
     // Base public path - important for worker loading
