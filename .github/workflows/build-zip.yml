@@ -27,7 +27,7 @@ jobs:
 
             # Step 4: Build the project
             - name: Build the project
-              run: npm run build:prod
+              run: npm run build:dev
 
             # Step 5: Get Project Name
             - name: Get Project Name

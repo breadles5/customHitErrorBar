@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => ({
     build: {
         emptyOutDir: true,
         outDir: "dist",
-        minify: "esbuild",
+        minify: mode === "production",
         // Generate sourcemaps based on mode
         sourcemap: mode === "development",
         // Configure rollup options
@@ -43,7 +43,7 @@ export default defineConfig(({ mode }) => ({
             treeShaking: true,
             minifyIdentifiers: mode === "production",
             minifySyntax: mode === "production",
-            minifyWhitespace: true,
+            minifyWhitespace: mode === "production",
         },
     },
     // Base public path - important for worker loading
