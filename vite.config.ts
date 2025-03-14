@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => ({
     build: {
         emptyOutDir: true,
         outDir: "dist",
-        minify: mode === "production",
+        minify: mode === ("production"),
         // Generate sourcemaps based on mode
         sourcemap: mode === "development",
         // Configure rollup options
