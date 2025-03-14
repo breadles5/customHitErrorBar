@@ -22,7 +22,6 @@ export const renderTicksOnLoad = (): void => {
 }
 
 
-// TODO: check tempTickPool ticks against cache.tickPool.pool ticks, if they share classNmaes or positions, dont rerender, otherwise, change only the position and className
 let tempTickPool = new TickPool();
 export const rerenderTicks = (): void => {
     for (let i = 0; i < tempTickPool.pool.length; i++) {
@@ -34,14 +33,14 @@ export const rerenderTicks = (): void => {
         if (tempTick.classNames !== tick.classNames) {
             tempTick.classNames = tick.classNames;
             tickElement.className = tempTick.classNames;
-            // console.log("[tick ${i}] className changed to ${tempTick.classNames}");
+            // console.log(`[tick ${i}] className changed to ${tempTick.classNames}`);
         }
 
         if (tempTick.position !== tick.position) {
             tempTick.position = tick.position;
             // should allow for gpu acceleration
             tickElement.style.transform = `translate3d(${tempTick.position}px, 0, 0)`;
-            // console.log("[tick ${i}] position changed to ${tempTick.position}");
+            // console.log(`[tick ${i}] position changed to ${tempTick.position}`);
         }
     }
 }
