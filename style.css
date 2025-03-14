@@ -82,13 +82,13 @@ body {
 }
 
 .arrow {
-    transition: transform opacity 200ms linear;
+    transition: transform 300ms linear, opacity 200ms linear;
     width: 0;
     height: 0;
     border-left: calc(var(--arrow-size) * 0.667) solid transparent;
     border-right: calc(var(--arrow-size) * 0.667) solid transparent;
     border-top: var(--arrow-size) solid var(--arrow-perfect);
-    transform: translateZ(0);
+    transform: translate3d(0,0,0);
     opacity: 1;
     will-change: transform opacity;
 }
