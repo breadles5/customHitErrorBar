@@ -130,22 +130,12 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
                 cache.mode = data.beatmap.mode.name;
                 cache.od = data.beatmap.stats.od.original;
                 cache.mods = data.play.mods.name;
-                cache.timingWindows = calculateModTimingWindows(cache.mode, cache.od, cache.mods);
-                console.log("[Main] recalculated timing windows:", Array.from(cache.timingWindows.entries()));
-                
-                // Send updated timing windows to worker
-                ticksWorker.postMessage({ 
-                    type: "set", 
-                    data: {
-                        timingWindows: cache.timingWindows, 
-                        settings: getSettings()
-                    } 
-                });
             }
             
             if (cache.state === "play") {
                 setVisible();
                 updateTimingWindowElements();
+                cache.timingWindows = calculateModTimingWindows(cache.mode, cache.od, cache.mods);
                 cache.isReset = false;
                 cache.isUIreset = false;
                 ticksWorker.postMessage({ 
