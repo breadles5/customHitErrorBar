@@ -726,11 +726,3 @@ export interface Settings {
     showSD: boolean;
     visible: boolean;
 }
-
-// export interface Tick {
-//     position: number;
-//     active: boolean;
-//     fadeout: boolean;
-//     timestamp: number; // timestamp in milliseconds
-//     classNames: string;
-// }
