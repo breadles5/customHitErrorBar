@@ -1,44 +1,24 @@
 import WebSocketManager from "./sockets/socket";
-import type { Settings, WEBSOCKET_V2, WEBSOCKET_V2_PRECISE } from "./sockets/types";
+import type { CommandData, WEBSOCKET_V2, WEBSOCKET_V2_PRECISE } from "./sockets/types";
 import { settings, updateSettings, getSettings } from "./utils/settings";
-import {
-    clearSD,
-    updateTimingWindowElements,
-    setHidden,
-    setVisible,
-    elementCache,
-    getAllElements,
-} from "./utils/elements";
+import { updateTimingWindowElements, setHidden, setVisible, elementCache, getAllElements } from "./utils/elements";
 import { calculateModTimingWindows } from "./utils/timingWindows";
 import { renderTicksOnLoad, rerenderTicks } from "./utils/ticks";
-import { resetArrow, updateArrow } from "./utils/arrow";
+import { updateArrow } from "./utils/arrow";
 import { TickPool } from "./workers/shared/tickPool";
+import { reset, resetUI } from "./utils/reset";
 
 window?.addEventListener("load", renderTicksOnLoad);
-interface WebSocketCommandMessage extends Partial<Settings> {
-    error?: string;
-    websocketUrl?: string;
-}
 
-interface CommandData {
-    command: string;
-    message: WebSocketCommandMessage;
-}
-
-const DEFAULT_HOST = "127.0.0.1:24050";
-let wsManager = new WebSocketManager(DEFAULT_HOST);
-let currentHost = DEFAULT_HOST;
-// initialize workers
-const ticksWorker = new Worker(new URL("./workers/ticks/ticksWorker", import.meta.url), { type: "module" });
-const statisticsWorker = new Worker(new URL("./workers/statistics/statisticsWorker", import.meta.url), {
-    type: "module",
-});
 interface cache {
     mode: string;
     mods: string;
     od: number;
     state: string;
-    statistics: Record<PropertyKey, number>;
+    statistics: {
+        averageError: number;
+        standardDeviationError: number;
+    };
     timingWindows: Map<PropertyKey, number>;
     tickPool: TickPool;
     isReset: boolean; // for state check
@@ -59,25 +39,36 @@ export const cache: cache = {
     isReset: true,
     isUIreset: true,
 };
-// Reset UI
-const resetUI = () => {
-    clearSD();
-    resetArrow();
+
+// initialize workers
+export const ticksWorker = new Worker(new URL("./workers/ticks/ticksWorker", import.meta.url), { type: "module" });
+export const statisticsWorker = new Worker(new URL("./workers/statistics/statisticsWorker", import.meta.url), {
+    type: "module",
+});
+// define message handlers
+ticksWorker.onmessage = (event) => {
+    const divs = getAllElements("div");
+    if (divs) {
+        elementCache.set("divs", divs);
+    }
+    cache.tickPool.pool = event.data;
     rerenderTicks();
-    console.log("[Main] reset UI");
 };
-// extends resetUI to reset everything
-const reset = () => {
-    resetUI();
-    cache.tickPool.set();
-    cache.statistics.averageError = 0;
-    cache.statistics.standardDeviationError = 0;
-    
-    // synchronizes worker caches
-    ticksWorker.postMessage({ type: "set" });
-    statisticsWorker.postMessage({ type: "set" });
-    console.log("[Main] reset");
+statisticsWorker.onmessage = (event) => {
+    cache.statistics.averageError = event.data.averageError;
+    cache.statistics.standardDeviationError = event.data.standardDeviationError;
+    const averageError = cache.statistics.averageError;
+    updateArrow(averageError);
+    if (elementCache.has("sd")) {
+        const sdElement = <HTMLElement>elementCache.get("sd");
+        sdElement.innerHTML = cache.statistics.standardDeviationError.toFixed(2);
+    }
 };
+
+// Tosu WebSocket connection
+const DEFAULT_HOST = "127.0.0.1:24050";
+let wsManager = new WebSocketManager(DEFAULT_HOST);
+let currentHost = DEFAULT_HOST;
 // Initialize WebSocket connection
 wsManager.sendCommand("getSettings", encodeURI(<string>window.COUNTER_PATH));
 
@@ -114,7 +105,7 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
         if (cache.state !== data.state.name) {
             console.log(`[GameState] State change: ${cache.state} to: ${data.state.name}`);
             cache.state = data.state.name;
-            
+
             const modeChanged: boolean = cache.mode !== data.play.mode.name;
             const odChanged: boolean = cache.od !== data.beatmap.stats.od.original;
             const modsChanged: boolean = cache.mods !== data.play.mods.name;
@@ -124,19 +115,19 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
                 cache.od = data.beatmap.stats.od.original;
                 cache.mods = data.play.mods.name;
             }
-            
+
             if (cache.state === "play") {
                 setVisible();
                 updateTimingWindowElements();
                 cache.timingWindows = calculateModTimingWindows(cache.mode, cache.od, cache.mods);
                 cache.isReset = false;
                 cache.isUIreset = false;
-                ticksWorker.postMessage({ 
-                    type: "set", 
+                ticksWorker.postMessage({
+                    type: "set",
                     data: {
-                        timingWindows: cache.timingWindows, 
-                        settings: getSettings()
-                    } 
+                        timingWindows: cache.timingWindows,
+                        settings: getSettings(),
+                    },
                 });
                 statisticsWorker.postMessage({ type: "set" });
             } else {
@@ -147,7 +138,6 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
                     cache.isUIreset = true;
                 }, settings.fadeOutDuration);
             }
-
         }
     } catch (error) {
         console.error("[MESSAGE_ERROR] Error processing WebSocket message:", error);
@@ -175,24 +165,6 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
         console.error("[MESSAGE_ERROR] Error processing WebSocket message:", error);
     }
 });
-
-ticksWorker.onmessage = (event) => {
-    const divs = getAllElements("div");
-    if (divs) {
-        elementCache.set("divs", divs);
-    }
-    cache.tickPool.pool = event.data;
-    rerenderTicks();
-};
-statisticsWorker.onmessage = (event) => {
-    cache.statistics = <Record<PropertyKey, number>>event.data;
-    const averageError = cache.statistics.averageError;
-    updateArrow(averageError);
-    if (elementCache.has("sd")) {
-        const sdElement = <HTMLElement>elementCache.get("sd");
-        sdElement.innerHTML = cache.statistics.standardDeviationError.toFixed(2);
-    }
-};
 
 // Cleanup on page unload
 window.addEventListener("unload", () => {
