@@ -2,11 +2,10 @@ import { getElement } from "./elements";
 import { cache } from "../index";
 import { TickPool } from "../workers/shared/tickPool";
 
-interface TickRender{
+interface TickRender {
     classNames: string;
     position: number;
 }
-
 
 export const renderTicksOnLoad = (): void => {
     const container = getElement(".tick-container");
@@ -19,17 +18,16 @@ export const renderTicksOnLoad = (): void => {
         fragment.appendChild(div);
     }
     container.appendChild(fragment);
-}
+};
 
-
-let tempTickPool = new TickPool();
+const tempTickPool = new TickPool();
 export const rerenderTicks = (): void => {
     for (let i = 0; i < tempTickPool.pool.length; i++) {
         const tempTick: TickRender = tempTickPool.pool[i];
         const tick = cache.tickPool.pool[i];
         const tickElement = document.getElementById(`${i}`); // i should be equal to tick.id
         if (!tickElement) return;
-        
+
         if (tempTick.classNames !== tick.classNames) {
             tempTick.classNames = tick.classNames;
             tickElement.className = tempTick.classNames;
@@ -43,4 +41,4 @@ export const rerenderTicks = (): void => {
             // console.log(`[tick ${i}] position changed to ${tempTick.position}`);
         }
     }
-}
+};

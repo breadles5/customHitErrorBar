@@ -1,7 +1,7 @@
 export const average = (arr: number[]): number => {
     if (!arr || arr.length === 0) return 0;
     return arr.reduce((a, b) => a + b, 0) / arr.length;
-}
+};
 
 export const standardDeviation = (arr: number[]): number => {
     if (!arr || arr.length === 0) return 0;
@@ -13,4 +13,4 @@ export const standardDeviation = (arr: number[]): number => {
     });
     const avgSquareDiff = average(squareDiffs);
     return Math.sqrt(avgSquareDiff);
-}
+};

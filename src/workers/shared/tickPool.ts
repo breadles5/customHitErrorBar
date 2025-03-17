@@ -42,12 +42,12 @@ export class TickImpl implements Tick {
         const timingWindows = tickPoolCache.timingWindows;
         // Start with base class
         this.classNames = "tick";
-    
+
         // Add timing window class if active
         if (this.active) {
             const hitError = Math.abs(this.position >> 1);
             let matched = false;
-    
+
             for (const [grade, range] of timingWindows) {
                 if (hitError <= range) {
                     this.classNames += ` _${String(grade)}`;
@@ -60,7 +60,7 @@ export class TickImpl implements Tick {
             }
         }
     }
-    
+
     // set tick to active
     setActive(hitError: number) {
         this.position = hitError << 1;
@@ -107,7 +107,7 @@ export class TickPool {
         // Initialize with explicit TickImpl instances and sequential IDs
         this.pool = Array.from({ length: POOL_SIZE }, (_, index) => new TickImpl());
     }
-    
+
     set() {
         // Ensure we're working with TickImpl instances
         for (const tick of this.pool) {
@@ -126,7 +126,7 @@ export class TickPool {
             const poolIndex = i % POOL_SIZE;
             const error = hitErrors[i];
             const tick = this.pool[poolIndex];
-            
+
             // Ensure we're working with a valid TickImpl instance
             if (!(tick instanceof TickImpl)) {
                 this.pool[poolIndex] = new TickImpl();

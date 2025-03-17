@@ -14,11 +14,10 @@ export const reset = () => {
     ticksWorker.postMessage({ type: "set" });
     statisticsWorker.postMessage({ type: "set" });
     console.log("[Main] reset");
-};// Reset UI
+}; // Reset UI
 export const resetUI = () => {
     clearSD();
     resetArrow();
     rerenderTicks();
     console.log("[Main] reset UI");
 };
-

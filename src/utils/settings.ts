@@ -40,7 +40,7 @@ let lastRoundedPercent = 0;
 
 export const getSettings = () => {
     return settings;
-}
+};
 
 // Update settings with new values
 export const updateSettings = (message: Partial<Settings>) => {

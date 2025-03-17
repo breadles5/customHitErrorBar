@@ -7,7 +7,7 @@ export interface Tick {
     setActive(hitError: number): void;
     setFadeout(): void;
     setInactive(): void;
-    resetActive(hitError: number): void
+    resetActive(hitError: number): void;
     reset(): void;
 }
 export interface TickPoolCache {
