@@ -59,7 +59,6 @@ export const cache: cache = {
     isReset: true,
     isUIreset: true,
 };
-
 // Reset UI
 const resetUI = () => {
     clearSD();
@@ -67,7 +66,6 @@ const resetUI = () => {
     rerenderTicks();
     console.log("[Main] reset UI");
 };
-
 // extends resetUI to reset everything
 const reset = () => {
     resetUI();
@@ -80,11 +78,6 @@ const reset = () => {
     statisticsWorker.postMessage({ type: "set" });
     console.log("[Main] reset");
 };
-
-// setInterval(() => {
-//     console.log(cache.tickPool.pool);
-// }, 10000);
-
 // Initialize WebSocket connection
 wsManager.sendCommand("getSettings", encodeURI(<string>window.COUNTER_PATH));
 
@@ -174,25 +167,6 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
         } else {
             ticksWorker.postMessage({ type: "update", data: hits });
             statisticsWorker.postMessage({ type: "update", data: cache.tickPool.pool });
-
-            ticksWorker.onmessage = (event) => {
-                const divs = getAllElements("div");
-                if (divs) {
-                    elementCache.set("divs", divs);
-                }
-                cache.tickPool.pool = event.data;
-                rerenderTicks();
-            };
-
-            statisticsWorker.onmessage = (event) => {
-                cache.statistics = <Record<PropertyKey, number>>event.data;
-                const averageError = cache.statistics.averageError;
-                updateArrow(averageError);
-                if (elementCache.has("sd")) {
-                    const sdElement = <HTMLElement>elementCache.get("sd");
-                    sdElement.innerHTML = cache.statistics.standardDeviationError.toFixed(2);
-                }
-            };
             if (cache.isUIreset) {
                 cache.isUIreset = false;
             }
@@ -201,6 +175,24 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
         console.error("[MESSAGE_ERROR] Error processing WebSocket message:", error);
     }
 });
+
+ticksWorker.onmessage = (event) => {
+    const divs = getAllElements("div");
+    if (divs) {
+        elementCache.set("divs", divs);
+    }
+    cache.tickPool.pool = event.data;
+    rerenderTicks();
+};
+statisticsWorker.onmessage = (event) => {
+    cache.statistics = <Record<PropertyKey, number>>event.data;
+    const averageError = cache.statistics.averageError;
+    updateArrow(averageError);
+    if (elementCache.has("sd")) {
+        const sdElement = <HTMLElement>elementCache.get("sd");
+        sdElement.innerHTML = cache.statistics.standardDeviationError.toFixed(2);
+    }
+};
 
 // Cleanup on page unload
 window.addEventListener("unload", () => {
