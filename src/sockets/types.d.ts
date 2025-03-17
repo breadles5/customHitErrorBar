@@ -47,6 +47,16 @@ export interface CALCULATE_PP_RESPONSE {
     ppAccuracy: number;
     effectiveMissCount: number;
 }
+export interface WebSocketCommandMessage extends Partial<Settings> {
+    error?: string;
+    websocketUrl?: string;
+}
+
+export interface CommandData {
+    command: string;
+    message: WebSocketCommandMessage;
+}
+
 export interface WEBSOCKET_V2 {
     client: "stable" | "lazer";
     server: string;
