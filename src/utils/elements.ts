@@ -1,5 +1,4 @@
 import { cache } from "../index.ts";
-import { renderTicksOnLoad } from "./ticks.ts";
 
 // DOM elements with memoization
 export const elementCache = new Map<string, HTMLElement | NodeListOf<HTMLElement>>();
