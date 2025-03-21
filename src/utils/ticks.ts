@@ -1,4 +1,4 @@
-import { getElement } from "./elements";
+import { elementCache, getAllElements, getElement } from "./elements";
 import { cache } from "../index";
 import { TickPool } from "../workers/shared/tickPool";
 
@@ -18,15 +18,23 @@ export const renderTicksOnLoad = (): void => {
         fragment.appendChild(div);
     }
     container.appendChild(fragment);
+    const divs = getAllElements("div");
+    if (divs) {
+        elementCache.set("divs", divs);
+    }
 };
 
 const tempTickPool = new TickPool();
-export const rerenderTicks = (): void => {
-    for (let i = 0; i < tempTickPool.pool.length; i++) {
-        const tempTick: TickRender = tempTickPool.pool[i];
+export const updateTicks = (): void => {
+    for (let i = 0; i < cache.tickPool.PoolSize; i++) {
         const tick = cache.tickPool.pool[i];
-        const tickElement = document.getElementById(`${i}`); // i should be equal to tick.id
-        if (!tickElement) return;
+        if (!tick) continue; // Skip if tick is undefined
+        
+        const tempTick: TickRender = tempTickPool.pool[i];
+        if (!tempTick) continue; // Skip if tempTick is undefined
+        
+        const tickElement = document.getElementById(`${i}`);
+        if (!tickElement) continue; // Changed from return to continue to keep processing other ticks
 
         if (tempTick.classNames !== tick.classNames) {
             tempTick.classNames = tick.classNames;
