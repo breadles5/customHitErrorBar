@@ -3,10 +3,11 @@ import type { CommandData, WEBSOCKET_V2, WEBSOCKET_V2_PRECISE } from "./sockets/
 import { settings, updateSettings, getSettings } from "./utils/settings";
 import { updateTimingWindowElements, setHidden, setVisible, elementCache, getAllElements } from "./utils/elements";
 import { calculateModTimingWindows } from "./utils/timingWindows";
-import { renderTicksOnLoad, rerenderTicks } from "./utils/ticks";
+import { renderTicksOnLoad, updateTicks } from "./utils/ticks";
 import { updateArrow } from "./utils/arrow";
 import { TickPool } from "./workers/shared/tickPool";
 import { reset, resetUI } from "./utils/reset";
+import { standardDeviation } from "./utils/statistics";
 
 window?.addEventListener("load", renderTicksOnLoad);
 
@@ -15,10 +16,6 @@ interface cache {
     mods: string;
     od: number;
     state: string;
-    statistics: {
-        averageError: number;
-        standardDeviationError: number;
-    };
     timingWindows: Map<PropertyKey, number>;
     tickPool: TickPool;
     isReset: boolean; // for state check
@@ -30,10 +27,6 @@ export const cache: cache = {
     mods: "", // mod names concatenated as string
     od: 0,
     state: "",
-    statistics: {
-        averageError: 0,
-        standardDeviationError: 0,
-    }, // keys are always known at compile/runtime, so its ok to leave this as on object
     timingWindows: new Map<string, number>(), // same can't be said here, since mania has 5 timing windows, while all taiko and standard have 3
     tickPool: new TickPool(),
     isReset: true,
@@ -42,26 +35,28 @@ export const cache: cache = {
 
 // initialize workers
 export const ticksWorker = new Worker(new URL("./workers/ticks/ticksWorker", import.meta.url), { type: "module" });
-export const statisticsWorker = new Worker(new URL("./workers/statistics/statisticsWorker", import.meta.url), {
-    type: "module",
-});
+
 // define message handlers
 ticksWorker.onmessage = (event) => {
-    const divs = getAllElements("div");
-    if (divs) {
-        elementCache.set("divs", divs);
-    }
-    cache.tickPool.pool = event.data;
-    rerenderTicks();
-};
-statisticsWorker.onmessage = (event) => {
-    cache.statistics.averageError = event.data.averageError;
-    cache.statistics.standardDeviationError = event.data.standardDeviationError;
-    const averageError = cache.statistics.averageError;
+    const { type, data } = event.data;
+    
+    // if (!Array.isArray(data)) {
+    //     console.error("[Worker] Received invalid data format:", data);
+    //     return;
+    // }
+
+    cache.tickPool.pool = data;
+    updateTicks();
+    
+    const activeTicks = cache.tickPool.pool.filter((tick) => tick?.active);
+    const errors: number[] = activeTicks.map((tick) => tick.position >> 1);
+    const averageError = errors.reduce((a, b) => a + b, 0) / errors.length;
     updateArrow(averageError);
-    if (elementCache.has("sd")) {
+    
+    if (settings.showSD) {
+        const standardDeviationError = standardDeviation(errors);
         const sdElement = <HTMLElement>elementCache.get("sd");
-        sdElement.innerHTML = cache.statistics.standardDeviationError.toFixed(2);
+        sdElement.innerText = standardDeviationError.toFixed(2);
     }
 };
 
@@ -129,7 +124,6 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
                         settings: getSettings(),
                     },
                 });
-                statisticsWorker.postMessage({ type: "set" });
             } else {
                 setHidden();
                 setTimeout(() => {
@@ -156,7 +150,6 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
             }
         } else {
             ticksWorker.postMessage({ type: "update", data: hits });
-            statisticsWorker.postMessage({ type: "update", data: cache.tickPool.pool });
             if (cache.isUIreset) {
                 cache.isUIreset = false;
             }
@@ -170,6 +163,5 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
 window.addEventListener("unload", () => {
     reset();
     ticksWorker.terminate();
-    statisticsWorker.terminate();
     console.log("[PAGE_UNLOAD] Workers terminated");
 });
