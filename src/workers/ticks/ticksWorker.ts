@@ -7,16 +7,12 @@ self.onmessage = (event) => {
     switch (type) {
         case "update":
             tickPool.update(data);
-            if (tickPoolCache.localHitErrors !== data) {
-                tickPoolCache.localHitErrors = data;
-                postMessage(tickPool.pool);
-            }
+            postMessage({type: "update", data: tickPool.pool});
             break;
         case "set": {
             const { timingWindows, settings } = data ?? { timingWindows: new Map<PropertyKey, number>(), settings: {} };
             setSettings(settings);
             tickPool.set();
-            tickPoolCache.localHitErrors = [];
             tickPoolCache.timingWindows = timingWindows;
             tickPoolCache.processedHits = 0;
             tickPoolCache.timedOutHits = 0;
