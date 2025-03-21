@@ -39,7 +39,7 @@ export const ticksWorker = new Worker(new URL("./workers/ticks/ticksWorker", imp
 // define message handlers
 ticksWorker.onmessage = (event) => {
     const { type, data } = event.data;
-    
+
     // if (!Array.isArray(data)) {
     //     console.error("[Worker] Received invalid data format:", data);
     //     return;
@@ -47,12 +47,12 @@ ticksWorker.onmessage = (event) => {
 
     cache.tickPool.pool = data;
     updateTicks();
-    
+
     const activeTicks = cache.tickPool.pool.filter((tick) => tick?.active);
     const errors: number[] = activeTicks.map((tick) => tick.position >> 1);
     const averageError = errors.reduce((a, b) => a + b, 0) / errors.length;
     updateArrow(averageError);
-    
+
     if (settings.showSD) {
         const standardDeviationError = standardDeviation(errors);
         const sdElement = <HTMLElement>elementCache.get("sd");

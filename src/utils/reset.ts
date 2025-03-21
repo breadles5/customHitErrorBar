@@ -1,4 +1,4 @@
-import { cache, ticksWorker} from "..";
+import { cache, ticksWorker } from "..";
 import { resetArrow } from "./arrow";
 import { clearSD } from "./elements";
 import { updateTicks } from "./ticks";

@@ -7,7 +7,7 @@ self.onmessage = (event) => {
     switch (type) {
         case "update":
             tickPool.update(data);
-            postMessage({type: "update", data: tickPool.pool});
+            postMessage({ type: "update", data: tickPool.pool });
             break;
         case "set": {
             const { timingWindows, settings } = data ?? { timingWindows: new Map<PropertyKey, number>(), settings: {} };

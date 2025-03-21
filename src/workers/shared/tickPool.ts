@@ -121,7 +121,10 @@ export class TickPool {
                 if (Date.now() - tick.timestamp > workerSettings.tickDuration && !tick.fadeout) {
                     TickImpl.setFadeout(tick);
                 }
-                if (Date.now() - tick.timestamp > workerSettings.tickDuration + workerSettings.fadeOutDuration && tick.active) {
+                if (
+                    Date.now() - tick.timestamp > workerSettings.tickDuration + workerSettings.fadeOutDuration &&
+                    tick.active
+                ) {
                     TickImpl.setInactive(tick);
                 }
             }

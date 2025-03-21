@@ -29,10 +29,10 @@ export const updateTicks = (): void => {
     for (let i = 0; i < cache.tickPool.PoolSize; i++) {
         const tick = cache.tickPool.pool[i];
         if (!tick) continue; // Skip if tick is undefined
-        
+
         const tempTick: TickRender = tempTickPool.pool[i];
         if (!tempTick) continue; // Skip if tempTick is undefined
-        
+
         const tickElement = document.getElementById(`${i}`);
         if (!tickElement) continue; // Changed from return to continue to keep processing other ticks
 
