@@ -1,4 +1,4 @@
-name: Build and Zip Artifacts
+name: build for osu-counters
 
 on:
     push:
@@ -27,7 +27,7 @@ jobs:
 
             # Step 4: Build the project
             - name: Build the project
-              run: npm run build:dev
+              run: npm run build:ci
 
             # Step 5: Get Project Name
             - name: Get Project Name
