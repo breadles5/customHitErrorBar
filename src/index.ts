@@ -1,13 +1,13 @@
 import WebSocketManager from "./sockets/socket";
 import type { CommandData, WEBSOCKET_V2, WEBSOCKET_V2_PRECISE } from "./sockets/types";
-import { settings, updateSettings, getSettings } from "./utils/settings";
-import { updateTimingWindowElements, setHidden, setVisible, elementCache, getAllElements } from "./utils/elements";
-import { calculateModTimingWindows } from "./utils/timingWindows";
-import { renderTicksOnLoad, updateTicks } from "./utils/ticks";
-import { updateArrow } from "./utils/arrow";
+import { settings, updateSettings, getSettings } from "./sockets/settings";
+import { updateTimingWindowElements, setHidden, setVisible, elementCache, getAllElements } from "./rendering/elements";
+import { calculateModTimingWindows } from "./calculation/timingWindows";
+import { renderTicksOnLoad, updateTicks } from "./rendering/ticks";
+import { updateArrow } from "./rendering/arrow";
 import { TickPool } from "./workers/shared/tickPool";
-import { reset, resetUI } from "./utils/reset";
-import { standardDeviation } from "./utils/statistics";
+import { reset, resetUI } from "./rendering/reset";
+import { standardDeviation } from "./calculation/statistics";
 
 window?.addEventListener("load", renderTicksOnLoad);
 

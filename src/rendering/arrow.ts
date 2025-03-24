@@ -1,5 +1,5 @@
-import { getElement } from "./elements";
-import { settings } from "./settings";
+import { getElement } from "../rendering/elements";
+import { settings } from "../sockets/settings";
 
 // Animation functions
 const getArrowColor = (average: number): string => {

@@ -1,4 +1,4 @@
-import { elementCache, getAllElements, getElement } from "./elements";
+import { elementCache, getAllElements, getElement } from "../rendering/elements";
 import { cache } from "../index";
 import { TickPool } from "../workers/shared/tickPool";
 

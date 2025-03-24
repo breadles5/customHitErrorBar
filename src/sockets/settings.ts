@@ -1,5 +1,5 @@
 import type { Settings } from "../sockets/types";
-import { getElement } from "./elements";
+import { getElement } from "../rendering/elements";
 /*
     lets agree to never touch this file again
     it's a mess
