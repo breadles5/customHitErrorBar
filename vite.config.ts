@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => ({
         outDir: "dist",
         minify: mode.match(/production|development/) ? "esbuild" : false,
         // Generate sourcemaps based on mode
-        sourcemap: !mode.match(/ci|prod/),
+        sourcemap: !mode.match(/ci|production/),
         // Configure rollup options
         rollupOptions: {
             input: {
