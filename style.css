@@ -170,7 +170,7 @@ body {
     width: var(--tick-width);
     height: var(--tick-height);
     border-radius: var(--tick-radius);
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
     will-change: transform opacity;
     contain: layout paint style;
     opacity: var(--tick-opacity);
@@ -183,8 +183,14 @@ body {
     pointer-events: none;
 }
 
+/* resets opacity to var(--tick-opacity) when inactive
+this way, when the tick is set to active again, it will be the correct opacity, and all the js has to do is 
+set the correct position */
 .tick.inactive {
     display: none;
+    opacity: var(--tick-opacity);
+    /* should hopefully transition instanteous in case tick is set to active while the opacity transition is still ongoing */
+    transition-duration: 0ms, 0ms;
 }
 /* Timing window-based colors for ticks */
 .tick._300g {
