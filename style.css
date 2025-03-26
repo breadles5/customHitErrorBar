@@ -165,6 +165,15 @@ body {
     clip-path: inset(0);
 }
 
+@keyframes fadeOut {
+    0% {
+        opacity: var(--tick-opacity);
+    }
+    100% {
+        opacity: 0;
+    }
+}
+
 .tick {
     position: absolute;
     width: var(--tick-width);
@@ -174,23 +183,18 @@ body {
     will-change: transform opacity;
     contain: layout paint style;
     opacity: var(--tick-opacity);
-    transition: opacity var(--fade-out-duration) linear;
     z-index: 7;
 }
 
-.tick.fadeout {
-    opacity: 0;
-    pointer-events: none;
+.tick:not(.inactive) {
+    animation: fadeOut var(--fade-out-duration) linear var(--tick-duration) forwards;
 }
 
-/* resets opacity to var(--tick-opacity) when inactive
-this way, when the tick is set to active again, it will be the correct opacity, and all the js has to do is 
-set the correct position */
 .tick.inactive {
-    display: none;
-    opacity: var(--tick-opacity);
-    /* should hopefully transition instanteous in case tick is set to active while the opacity transition is still ongoing */
-    transition-duration: 0ms, 0ms;
+    visibility: hidden;
+    pointer-events: none;
+    animation: none;
+    opacity: 0;
 }
 /* Timing window-based colors for ticks */
 .tick._300g {

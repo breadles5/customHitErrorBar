@@ -5,7 +5,7 @@ import { updateTimingWindowElements, setHidden, setVisible, elementCache, getAll
 import { calculateModTimingWindows } from "./calculation/timingWindows";
 import { renderTicksOnLoad, updateTicks } from "./rendering/ticks";
 import { updateArrow } from "./rendering/arrow";
-import { TickPool } from "./workers/shared/tickPool";
+import { TickPool } from "./calculation/tickPool";
 import { reset, resetUI } from "./rendering/reset";
 import { standardDeviation } from "./calculation/statistics";
 
@@ -31,33 +31,6 @@ export const cache: cache = {
     tickPool: new TickPool(),
     isReset: true,
     isUIreset: true,
-};
-
-// initialize workers
-export const ticksWorker = new Worker(new URL("./workers/ticks/ticksWorker", import.meta.url), { type: "module" });
-
-// define message handlers
-ticksWorker.onmessage = (event) => {
-    const { type, data } = event.data;
-
-    // if (!Array.isArray(data)) {
-    //     console.error("[Worker] Received invalid data format:", data);
-    //     return;
-    // }
-
-    cache.tickPool.pool = data;
-    updateTicks();
-
-    const activeTicks = cache.tickPool.pool.filter((tick) => tick?.active);
-    const errors: number[] = activeTicks.map((tick) => tick.position >> 1);
-    const averageError = errors.reduce((a, b) => a + b, 0) / errors.length;
-    updateArrow(averageError);
-
-    if (settings.showSD) {
-        const standardDeviationError = standardDeviation(errors);
-        const sdElement = <HTMLElement>elementCache.get("sd");
-        sdElement.innerText = standardDeviationError.toFixed(2);
-    }
 };
 
 // Tosu WebSocket connection
@@ -112,18 +85,11 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
             }
 
             if (cache.state === "play") {
-                setVisible();
-                updateTimingWindowElements();
                 cache.timingWindows = calculateModTimingWindows(cache.mode, cache.od, cache.mods);
+                updateTimingWindowElements();
+                setVisible();
                 cache.isReset = false;
                 cache.isUIreset = false;
-                ticksWorker.postMessage({
-                    type: "set",
-                    data: {
-                        timingWindows: cache.timingWindows,
-                        settings: getSettings(),
-                    },
-                });
             } else {
                 setHidden();
                 setTimeout(() => {
@@ -140,28 +106,35 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
 
 // Handle hit error updates
 wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
-    try {
-        const hits = data.hitErrors ?? [];
+    const hits = data.hitErrors ?? [];
 
-        if (hits.length === 0) {
-            if (!cache.isUIreset) {
-                resetUI();
-                cache.isUIreset = true;
-            }
-        } else {
-            ticksWorker.postMessage({ type: "update", data: hits });
-            if (cache.isUIreset) {
-                cache.isUIreset = false;
-            }
+    if (hits.length === 0) {
+        if (!cache.isUIreset) {
+            resetUI();
+            cache.isUIreset = true;
         }
-    } catch (error) {
-        console.error("[MESSAGE_ERROR] Error processing WebSocket message:", error);
+    } else {
+        cache.tickPool.update(hits);
+        updateTicks();
+
+        const activeTicks = cache.tickPool.pool.filter((tick) => tick.active);
+        const errors: number[] = activeTicks.map((tick) => tick.position >> 1);
+        const averageError = errors.reduce((a, b) => a + b, 0) / errors.length;
+        updateArrow(averageError);
+
+        if (settings.showSD) {
+            const standardDeviationError = standardDeviation(errors);
+            const sdElement = <HTMLElement>elementCache.get("sd");
+            sdElement.innerText = standardDeviationError.toFixed(2);
+        }
+        if (cache.isUIreset) {
+            cache.isUIreset = false;
+        }
     }
 });
 
 // Cleanup on page unload
 window.addEventListener("unload", () => {
     reset();
-    ticksWorker.terminate();
     console.log("[PAGE_UNLOAD] Workers terminated");
 });

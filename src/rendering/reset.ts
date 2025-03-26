@@ -1,4 +1,4 @@
-import { cache, ticksWorker } from "..";
+import { cache } from "..";
 import { resetArrow } from "./arrow";
 import { clearSD } from "./elements";
 import { updateTicks } from "./ticks";
@@ -7,9 +7,6 @@ import { updateTicks } from "./ticks";
 export const reset = () => {
     resetUI();
     cache.tickPool.set();
-
-    // synchronizes worker caches
-    ticksWorker.postMessage({ type: "set" });
     console.log("[Main] reset");
 }; // Reset UI
 export const resetUI = () => {
