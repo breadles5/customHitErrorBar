@@ -25,9 +25,6 @@ window.addEventListener("unload", () => {
 export const setHidden = () => getAllElements("div")?.forEach((div) => div.classList.add("hidden"));
 export const setVisible = () => getAllElements("div")?.forEach((div) => div.classList.remove("hidden"));
 
-// Add hidden class to all elements by default
-setHidden();
-
 export const clearSD = (): void => {
     const sd = getElement(".sd");
     if (sd) {
@@ -56,8 +53,9 @@ export function updateTimingWindowElements() {
         div.style.width = `${Math.abs(width * 4)}px`;
         return div;
     };
-
+    const fragment = document.createDocumentFragment();
     timingWindows.forEach((width, grade) => {
-        colorsContainer?.appendChild(createTimingWindow(String(grade), width));
+        fragment.appendChild(createTimingWindow(String(grade), width));
     });
+    colorsContainer?.appendChild(fragment);
 }
