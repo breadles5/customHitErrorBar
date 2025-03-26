@@ -104,7 +104,7 @@ export class TickPool {
                     this.timedOutHits++;
                 }
                 // Check for timeout using the cached 'now'
-                if (tick.active && (now - tick.timestamp > timeoutThreshold)) {
+                if (tick.active && now - tick.timestamp > timeoutThreshold) {
                     TickImpl.setInactive(tick);
                     this.timedOutHits++;
                 }
