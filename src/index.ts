@@ -84,13 +84,13 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
             const modeChanged: boolean = cache.mode !== data.play.mode.name;
             const odChanged: boolean = cache.od !== data.beatmap.stats.od.original;
             const modsChanged: boolean = cache.mods !== data.play.mods.name;
-    
+
             if (modeChanged || odChanged || modsChanged) {
                 cache.mode = data.beatmap.mode.name;
                 cache.od = data.beatmap.stats.od.original;
                 cache.mods = data.play.mods.name;
             }
-            
+
             cache.firstObjectTime = data.beatmap.time.firstObject;
             cache.timingWindows = calculateModTimingWindows(cache.mode, cache.od, cache.mods);
             updateTimingWindowElements();
@@ -121,13 +121,12 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
         cache.tickPool.update(hits);
         updateTicks();
 
-        const activeTicks = cache.tickPool.pool.filter((tick) => tick.active);
-        const errors: number[] = activeTicks.map((tick) => tick.position >> 1);
-        const averageError = errors.reduce((a, b) => a + b, 0) / errors.length;
+        const activeErrors = cache.tickPool.pool.filter((tick) => tick.active).map((tick) => tick.position >> 1);
+        const averageError = activeErrors.reduce((a, b) => a + b, 0) / activeErrors.length;
         updateArrow(averageError);
 
         if (settings.showSD) {
-            const standardDeviationError = standardDeviation(errors);
+            const standardDeviationError = standardDeviation(activeErrors);
             const sdElement = getElement(".sd");
             if (sdElement) {
                 sdElement.innerText = standardDeviationError.toFixed(2);
