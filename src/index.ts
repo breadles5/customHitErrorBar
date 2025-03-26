@@ -96,7 +96,6 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
             updateTimingWindowElements();
             setVisible();
             cache.isReset = false;
-            cache.isReset = false;
         } else {
             setHidden();
             setTimeout(() => {
