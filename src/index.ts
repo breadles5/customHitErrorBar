@@ -80,17 +80,17 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
     if (cache.state !== data.state.name) {
         cache.state = data.state.name;
 
-        const modeChanged: boolean = cache.mode !== data.play.mode.name;
-        const odChanged: boolean = cache.od !== data.beatmap.stats.od.original;
-        const modsChanged: boolean = cache.mods !== data.play.mods.name;
-
-        if (modeChanged || odChanged || modsChanged) {
-            cache.mode = data.beatmap.mode.name;
-            cache.od = data.beatmap.stats.od.original;
-            cache.mods = data.play.mods.name;
-        }
-
         if (cache.state === "play") {
+            const modeChanged: boolean = cache.mode !== data.play.mode.name;
+            const odChanged: boolean = cache.od !== data.beatmap.stats.od.original;
+            const modsChanged: boolean = cache.mods !== data.play.mods.name;
+    
+            if (modeChanged || odChanged || modsChanged) {
+                cache.mode = data.beatmap.mode.name;
+                cache.od = data.beatmap.stats.od.original;
+                cache.mods = data.play.mods.name;
+            }
+            
             cache.firstObjectTime = data.beatmap.time.firstObject;
             cache.timingWindows = calculateModTimingWindows(cache.mode, cache.od, cache.mods);
             updateTimingWindowElements();
