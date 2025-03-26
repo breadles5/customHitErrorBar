@@ -84,6 +84,10 @@ export class TickPool {
     }
 
     update(hitErrors: number[]) {
+        // Get current time once before the loop
+        const now = Date.now();
+        const timeoutThreshold = settings.tickDuration + settings.fadeOutDuration;
+
         for (let i = this.timedOutHits; i < hitErrors.length; i++) {
             const poolIndex = i % this.PoolSize;
             const error = hitErrors[i];
@@ -99,7 +103,8 @@ export class TickPool {
                     this.processedHits++;
                     this.timedOutHits++;
                 }
-                if (Date.now() - tick.timestamp > settings.tickDuration + settings.fadeOutDuration && tick.active) {
+                // Check for timeout using the cached 'now'
+                if (tick.active && (now - tick.timestamp > timeoutThreshold)) {
                     TickImpl.setInactive(tick);
                     this.timedOutHits++;
                 }
