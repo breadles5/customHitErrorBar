@@ -1,47 +1,57 @@
-import { elementCache, getAllElements, getElement } from "../rendering/elements";
+import { getElement } from "../rendering/elements"; // Only need getElement
 import { cache } from "../index";
 
-interface TickRender {
-    classNames: string;
-    position: number;
-}
+// Module-level cache for tick DOM elements
+const tickElementsArray: HTMLElement[] = [];
+let areTicksRendered = false; // Flag to indicate if initial render is done
 
 export const renderTicksOnLoad = (): void => {
+    if (areTicksRendered) return; // Prevent re-rendering
+
     const container = getElement(".tick-container");
-    if (!container) return;
+    if (!container) {
+        console.error("Tick container not found!");
+        return;
+    }
     const fragment = document.createDocumentFragment();
-    for (let i = 0; i < cache.tickPool.pool.length; i++) {
+    tickElementsArray.length = 0; // Clear array (safety for potential future re-renders)
+
+    for (let i = 0; i < cache.tickPool.PoolSize; i++) { // Use PoolSize for consistency
         const div = document.createElement("div");
-        div.id = `${i}`;
         div.className = "tick inactive";
+        // div.id = `${i}`; // Optional
         fragment.appendChild(div);
+        tickElementsArray.push(div); // Store reference directly
     }
     container.appendChild(fragment);
-    const divs = getAllElements("div");
-    if (divs) {
-        elementCache.set("divs", divs);
-    }
+    areTicksRendered = true; // Set flag after elements are added
+    console.log(`Rendered ${tickElementsArray.length} tick elements.`); // Debug log
 };
 
 export const resetTicks = (): void => {
-    for (let i = 0; i < cache.tickPool.PoolSize; i++) {
-        const tick = document.getElementById(`${i}`);
-        if (!tick) continue;
-        tick.className = "tick inactive";
-        tick.style.transform = "translate3d(0px, 0, 0)";
+    if (!areTicksRendered) return; // Don't try to reset if not rendered
+
+    for (let i = 0; i < tickElementsArray.length; i++) {
+        const tickElement = tickElementsArray[i];
+        if (!tickElement) continue;
+        tickElement.className = "tick inactive";
+        tickElement.style.transform = "translate3d(0px, 0, 0)";
     }
 };
+
 export const updateTicks = (): void => {
-    for (let i = 0; i < cache.tickPool.PoolSize; i++) {
-        const tick = cache.tickPool.pool[i];
-        if (!tick) continue; // Skip if tick is undefined
-
-        const tickElement = document.getElementById(`${i}`);
-        if (!tickElement) continue; // Changed from return to continue to keep processing other ticks
-
-        if (tick.classNames !== tickElement.className) {
-            tickElement.className = tick.classNames;
-            tickElement.style.transform = `translate3d(${tick.position}px, 0, 0)`;
+    requestAnimationFrame(() => {
+        const poolSize = cache.tickPool.PoolSize;
+    
+        for (let i = 0; i < poolSize; i++) {
+            const tick = cache.tickPool.pool[i];
+            const tickElement = tickElementsArray[i]; // Direct access
+    
+            // if you recall properly, ticks classNames and position are updated at once, so no need to make another check for position
+            if (tick.classNames !== tickElement.className) {
+                tickElement.className = tick.classNames;
+                tickElement.style.transform = `translate3d(${tick.position}px, 0, 0)`;
+            }
         }
-    }
+    })
 };
