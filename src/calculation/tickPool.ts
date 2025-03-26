@@ -79,6 +79,8 @@ export class TickPool {
         for (const tick of this.pool) {
             TickImpl.reset(tick);
         }
+        this.timedOutHits = 0;
+        this.processedHits = 0;
     }
 
     update(hitErrors: number[]) {

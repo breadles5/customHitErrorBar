@@ -23,6 +23,14 @@ export const renderTicksOnLoad = (): void => {
     }
 };
 
+export const resetTicks = (): void => {
+    for (let i = 0; i < cache.tickPool.PoolSize; i++) {
+        const tick = document.getElementById(`${i}`);
+        if (!tick) continue;
+        tick.className = "tick inactive";
+        tick.style.transform = "translate3d(0px, 0, 0)";
+    }
+};
 export const updateTicks = (): void => {
     for (let i = 0; i < cache.tickPool.PoolSize; i++) {
         const tick = cache.tickPool.pool[i];

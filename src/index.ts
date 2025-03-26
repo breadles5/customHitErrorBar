@@ -1,12 +1,19 @@
 import WebSocketManager from "./sockets/socket";
 import type { CommandData, WEBSOCKET_V2, WEBSOCKET_V2_PRECISE } from "./sockets/types";
 import { settings, updateSettings, getSettings } from "./sockets/settings";
-import { updateTimingWindowElements, setHidden, setVisible, elementCache, getAllElements } from "./rendering/elements";
+import {
+    updateTimingWindowElements,
+    setHidden,
+    setVisible,
+    elementCache,
+    getAllElements,
+    getElement,
+} from "./rendering/elements";
 import { calculateModTimingWindows } from "./calculation/timingWindows";
 import { renderTicksOnLoad, updateTicks } from "./rendering/ticks";
 import { updateArrow } from "./rendering/arrow";
 import { TickPool } from "./calculation/tickPool";
-import { reset, resetUI } from "./rendering/reset";
+import { reset } from "./rendering/reset";
 import { standardDeviation } from "./calculation/statistics";
 
 window?.addEventListener("load", renderTicksOnLoad);
@@ -18,8 +25,8 @@ interface cache {
     state: string;
     timingWindows: Map<PropertyKey, number>;
     tickPool: TickPool;
+    firstObjectTime: number;
     isReset: boolean; // for state check
-    isUIreset: boolean; // for hit error array check
 }
 // no need to convert to map, since keys are already known at compile/runtime.
 export const cache: cache = {
@@ -29,8 +36,8 @@ export const cache: cache = {
     state: "",
     timingWindows: new Map<string, number>(), // same can't be said here, since mania has 5 timing windows, while all taiko and standard have 3
     tickPool: new TickPool(),
+    firstObjectTime: 0,
     isReset: true,
-    isUIreset: true,
 };
 
 // Tosu WebSocket connection
@@ -63,55 +70,53 @@ wsManager.commands((data: CommandData) => {
             updateSettings(message);
         }
     } catch (error) {
+        // this is still needed for debugging
         console.error("[MESSAGE_ERROR] Error processing WebSocket message:", error);
     }
 });
 
 // Handle game state and menu updates
 wsManager.api_v2((data: WEBSOCKET_V2) => {
-    try {
-        if (cache.state !== data.state.name) {
-            console.log(`[GameState] State change: ${cache.state} to: ${data.state.name}`);
-            cache.state = data.state.name;
+    if (cache.state !== data.state.name) {
+        cache.state = data.state.name;
 
-            const modeChanged: boolean = cache.mode !== data.play.mode.name;
-            const odChanged: boolean = cache.od !== data.beatmap.stats.od.original;
-            const modsChanged: boolean = cache.mods !== data.play.mods.name;
+        const modeChanged: boolean = cache.mode !== data.play.mode.name;
+        const odChanged: boolean = cache.od !== data.beatmap.stats.od.original;
+        const modsChanged: boolean = cache.mods !== data.play.mods.name;
 
-            if (modeChanged || odChanged || modsChanged) {
-                cache.mode = data.beatmap.mode.name;
-                cache.od = data.beatmap.stats.od.original;
-                cache.mods = data.play.mods.name;
-            }
-
-            if (cache.state === "play") {
-                cache.timingWindows = calculateModTimingWindows(cache.mode, cache.od, cache.mods);
-                updateTimingWindowElements();
-                setVisible();
-                cache.isReset = false;
-                cache.isUIreset = false;
-            } else {
-                setHidden();
-                setTimeout(() => {
-                    reset();
-                    cache.isReset = true;
-                    cache.isUIreset = true;
-                }, settings.fadeOutDuration);
-            }
+        if (modeChanged || odChanged || modsChanged) {
+            cache.mode = data.beatmap.mode.name;
+            cache.od = data.beatmap.stats.od.original;
+            cache.mods = data.play.mods.name;
         }
-    } catch (error) {
-        console.error("[MESSAGE_ERROR] Error processing WebSocket message:", error);
+
+        if (cache.state === "play") {
+            cache.firstObjectTime = data.beatmap.time.firstObject;
+            cache.timingWindows = calculateModTimingWindows(cache.mode, cache.od, cache.mods);
+            updateTimingWindowElements();
+            setVisible();
+            cache.isReset = false;
+            cache.isReset = false;
+        } else {
+            setHidden();
+            setTimeout(() => {
+                reset();
+                cache.isReset = true;
+            }, settings.fadeOutDuration);
+        }
     }
 });
 
 // Handle hit error updates
 wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
     const hits = data.hitErrors ?? [];
+    // currentTime is guaranteed to change on each response, so no point in caching it
+    const currentTime = data.currentTime;
 
-    if (hits.length === 0) {
-        if (!cache.isUIreset) {
-            resetUI();
-            cache.isUIreset = true;
+    if (currentTime < cache.firstObjectTime) {
+        if (!cache.isReset) {
+            reset();
+            cache.isReset = true;
         }
     } else {
         cache.tickPool.update(hits);
@@ -124,11 +129,13 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
 
         if (settings.showSD) {
             const standardDeviationError = standardDeviation(errors);
-            const sdElement = <HTMLElement>elementCache.get("sd");
-            sdElement.innerText = standardDeviationError.toFixed(2);
+            const sdElement = getElement(".sd");
+            if (sdElement) {
+                sdElement.innerText = standardDeviationError.toFixed(2);
+            }
         }
-        if (cache.isUIreset) {
-            cache.isUIreset = false;
+        if (cache.isReset) {
+            cache.isReset = false;
         }
     }
 });
