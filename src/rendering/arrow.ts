@@ -2,6 +2,7 @@ import { getElement } from "../rendering/elements";
 import { settings } from "../sockets/settings";
 
 // Animation functions
+const arrow = getElement(".arrow");
 const getArrowColor = (average: number): string => {
     const absError = Math.abs(average);
     const threshold = settings.perfectArrowThreshold;
@@ -15,7 +16,6 @@ const getArrowColor = (average: number): string => {
 };
 
 export function updateArrow(targetPosition: number) {
-    const arrow = getElement(".arrow");
     if (arrow) {
         // should allow for gpu acceleration?
         arrow.style.transform = `translate3d(${targetPosition * 2}px, 0, 0)`;
@@ -24,7 +24,6 @@ export function updateArrow(targetPosition: number) {
 }
 
 export function resetArrow() {
-    const arrow = getElement(".arrow");
     if (arrow) {
         arrow.style.transform = "translateX(0px)";
         arrow.style.borderTopColor = "#fff";
