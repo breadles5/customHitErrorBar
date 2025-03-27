@@ -76,6 +76,7 @@ wsManager.commands((data: CommandData) => {
 });
 
 // Handle game state and menu updates
+const apiV2Filters = ["state", "play", "beatmap"];
 wsManager.api_v2((data: WEBSOCKET_V2) => {
     if (cache.state !== data.state.name) {
         cache.state = data.state.name;
@@ -104,7 +105,7 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
             }, settings.fadeOutDuration);
         }
     }
-});
+}, apiV2Filters);
 
 // Handle hit error updates
 wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
@@ -136,10 +137,4 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
             cache.isReset = false;
         }
     }
-});
-
-// Cleanup on page unload
-window.addEventListener("unload", () => {
-    reset();
-    console.log("[PAGE_UNLOAD] Workers terminated");
-});
+}, ["hitErrors", "currentTime"]);

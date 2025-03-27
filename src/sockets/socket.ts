@@ -134,4 +134,4 @@ class WebSocketManager {
 
 export default WebSocketManager;
 
-type Filters = string | { field: string; keys: Filters[] };
+type Filters = string | string[] | { field: string; keys: Filters[] };
