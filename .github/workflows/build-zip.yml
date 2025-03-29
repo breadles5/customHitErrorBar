@@ -3,7 +3,7 @@ name: Build and Zip Artifacts
 on:
     push:
         branches:
-            - "**" # This will match all branches
+            - "master" # This will match all branches
     pull_request: # Optional: Run on pull requests too
 
 jobs:

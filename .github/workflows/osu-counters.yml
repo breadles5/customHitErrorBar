@@ -1,10 +1,10 @@
 name: build for osu-counters
 
 on:
-    push:
+    pull_request:
         branches:
-            - "**" # This will match all branches
-    pull_request: # Optional: Run on pull requests too
+            - "CI" # Only run on PRs targeting the CI branch
+        types: [opened, synchronize] # Run when PR is opened or updated
 
 jobs:
     build:
@@ -29,23 +29,64 @@ jobs:
             - name: Build the project
               run: npm run build:ci
 
-            # Step 5: Get Project Name
-            - name: Get Project Name
-              id: get-project-name
-              run: |
-                  PROJECT_NAME=$(node -p "require('./package.json').name")
-                  echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_OUTPUT
+            # Step 5: Checkout target repository
+            - name: Checkout target repository
+              uses: actions/checkout@v4
+              with:
+                  repository: tOSUapp/counters # Target repository
+                  token: ${{ secrets.TARGET_REPO_PAT }} # PAT secret for authentication
+                  path: deploy_target # Checkout to a temporary directory
 
-            # Step 6: Zip the build directory
-            - name: Zip the build directory
+            # Step 6: Copy build files to target repository
+            - name: Copy build files
               run: |
-                  zip -r ${{ steps.get-project-name.outputs.PROJECT_NAME }}.zip ./dist/*
+                  mkdir -p deploy_target/counters/customhiterrorbar # Ensure the target folder exists
+                  echo "Cleaning target directory..."
+                  rm -rf deploy_target/counters/customhiterrorbar/*
+                  echo "Copying build files..."
+                  cp -r ./dist/* deploy_target/counters/customhiterrorbar/ # Copy build output
               shell: bash
 
-            # Step 7: Upload the zip file as an artifact
-            - name: Upload the artifact
-              uses: actions/upload-artifact@v4
-              with:
-                  name: ${{ steps.get-project-name.outputs.PROJECT_NAME }}
-                  path: ${{ steps.get-project-name.outputs.PROJECT_NAME }}.zip
-                  compression-level: 0 # Skip compression since file is already zipped
+            # Step 7: Commit and push changes to a new branch in target repository
+            - name: Commit and push changes to new branch
+              id: commit_push
+              run: |
+                  cd deploy_target
+                  git config user.name 'github-actions[bot]'
+                  git config user.email 'github-actions[bot]@users.noreply.github.com'
+                  git add counters/customhiterrorbar/*
+                  # Check if there are changes to commit to avoid empty commits
+                  if git diff --staged --quiet --exit-code; then
+                    echo "No changes detected in counters directory."
+                    echo "changes_exist=false" >> $GITHUB_OUTPUT
+                  else
+                    BRANCH_NAME="update-counters-${{ github.run_id }}"
+                    echo "branch=${BRANCH_NAME}" >> $GITHUB_OUTPUT
+                    echo "changes_exist=true" >> $GITHUB_OUTPUT
+                    git checkout -b $BRANCH_NAME
+                    git commit -m "Update counters from build job ${{ github.run_id }} (${{ github.sha }})"
+                    git push --set-upstream origin $BRANCH_NAME
+                  fi
+              shell: bash
+
+            # Step 8: Create Pull Request using GitHub CLI
+            - name: Create Pull Request using GitHub CLI
+              if: steps.commit_push.outputs.changes_exist == 'true' # Only run if changes were pushed
+              env:
+                  GH_TOKEN: ${{ secrets.TARGET_REPO_PAT }} # Use the PAT for authentication
+                  GH_REPO: tOSUapp/counters # Target repository
+                  HEAD_BRANCH: ${{ steps.commit_push.outputs.branch }}
+                  BASE_BRANCH: main # Or the default branch of tOSUapp/counters
+                  PR_TITLE: "Update Counters from Build ${{ github.run_id }}"
+                  PR_BODY: |
+                      Automated update of counter files from build job ${{ github.run_id }}.
+                      Triggered by commit: ${{ github.sha }} in ${{ github.repository }}
+                      Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+              run: |
+                  gh pr create \
+                    --repo "$GH_REPO" \
+                    --base "$BASE_BRANCH" \
+                    --head "$HEAD_BRANCH" \
+                    --title "$PR_TITLE" \
+                    --body "$PR_BODY"
+              shell: bash
