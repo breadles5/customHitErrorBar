@@ -49,3 +49,4 @@ jobs:
                   name: ${{ steps.get-project-name.outputs.PROJECT_NAME }}
                   path: ${{ steps.get-project-name.outputs.PROJECT_NAME }}.zip
                   compression-level: 0 # Skip compression since file is already zipped
+                  retention-days: 5 # Keep the artifact for 5 days
