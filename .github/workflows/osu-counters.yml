@@ -33,7 +33,7 @@ jobs:
             - name: Checkout target repository
               uses: actions/checkout@v4
               with:
-                  repository: tOSUapp/counters # Target repository
+                  repository: tosuapp/counters # Target repository
                   token: ${{ secrets.TARGET_REPO_PAT }} # PAT secret for authentication
                   path: deploy_target # Checkout to a temporary directory
 
@@ -74,7 +74,7 @@ jobs:
               if: steps.commit_push.outputs.changes_exist == 'true' # Only run if changes were pushed
               env:
                   GH_TOKEN: ${{ secrets.TARGET_REPO_PAT }} # Use the PAT for authentication
-                  GH_REPO: tOSUapp/counters # Target repository
+                  GH_REPO: tosuapp/counters # Target repository
                   HEAD_BRANCH: ${{ steps.commit_push.outputs.branch }}
                   BASE_BRANCH: main # Or the default branch of tOSUapp/counters
                   PR_TITLE: "Update Counters from Build ${{ github.run_id }}"
