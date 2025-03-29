@@ -15,7 +15,7 @@ import { renderTicksOnLoad, updateTicks } from "./rendering/ticks";
 import { updateArrow } from "./rendering/arrow";
 import { TickPool } from "./calculation/tickPool";
 import { reset } from "./rendering/reset";
-import { standardDeviation } from "./calculation/statistics";
+import { median, standardDeviation } from "./calculation/statistics";
 
 window?.addEventListener("load", renderTicksOnLoad);
 
@@ -109,10 +109,9 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
 }, apiV2Filters);
 
 // Handle hit error updates
+const apiV2PreciseFilter = ["hitErrors", "currentTime"];
 wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
-    const hits = data.hitErrors ?? [];
-    // currentTime is guaranteed to change on each response, so no point in caching it
-    const currentTime = data.currentTime;
+    const { hitErrors, currentTime } = data;
 
     if (currentTime < cache.firstObjectTime) {
         if (!cache.isReset) {
@@ -120,14 +119,18 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
             cache.isReset = true;
         }
     } else {
-        cache.tickPool.update(hits);
+        cache.tickPool.update(hitErrors);
         updateTicks();
 
-        const activeErrors = cache.tickPool.pool.filter((tick) => tick.active).map((tick) => tick.position >> 1);
+        // Replace filter with direct access via activeTicks
+        const activeErrors: number[] = [];
+        for (const idx of cache.tickPool.activeTicks) {
+            activeErrors.push(cache.tickPool.pool[idx].position >> 1);
+        }
         const averageError = activeErrors.reduce((a, b) => a + b, 0) / activeErrors.length;
-        updateArrow(averageError);
-
+        updateArrow(median(activeErrors));
         if (settings.showSD) {
+            // use activeErrors as is before modifying it
             const standardDeviationError = standardDeviation(activeErrors);
             const sdElement = getElement(".sd");
             if (sdElement) {
@@ -138,4 +141,4 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
             cache.isReset = false;
         }
     }
-}, ["hitErrors", "currentTime"]);
+}, apiV2PreciseFilter);

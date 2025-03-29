@@ -67,6 +67,7 @@ export class TickPool {
     timedOutHits: number;
     processedHits: number;
     pool: TickImpl[];
+    readonly activeTicks: Set<number> = new Set(); // Store indices of active ticks
 
     constructor() {
         this.PoolSize = 50;
@@ -84,28 +85,37 @@ export class TickPool {
     }
 
     update(hitErrors: number[]) {
-        // Get current time once before the loop
         const now = Date.now();
         const timeoutThreshold = settings.tickDuration + settings.fadeOutDuration;
 
+        // Check timeouts only for active ticks
+        for (const idx of this.activeTicks) {
+            const tick = this.pool[idx];
+            if (now - tick.timestamp > timeoutThreshold) {
+                TickImpl.setInactive(tick);
+                this.timedOutHits++;
+                this.activeTicks.delete(idx);
+            }
+        }
+
+        // Process new hits
+        // having an `inactiveTicks` set would be useless
+        // since we still neeed to access poolIndex AND the hitError of what should be the corresponding error
+        // this is also really efficient since we are NOT iterating over the entire hitErrors array
         for (let i = this.timedOutHits; i < hitErrors.length; i++) {
             const poolIndex = i % this.PoolSize;
             const error = hitErrors[i];
             const tick = this.pool[poolIndex];
 
-            const processedHitsindex = this.processedHits - 1;
             if (!tick.active) {
                 TickImpl.setActive(tick, error);
+                this.activeTicks.add(poolIndex);
                 this.processedHits++;
             } else {
+                const processedHitsindex = this.processedHits - 1;
                 if (i > processedHitsindex) {
                     TickImpl.resetActive(tick, error);
                     this.processedHits++;
-                    this.timedOutHits++;
-                }
-                // Check for timeout using the cached 'now'
-                if (tick.active && now - tick.timestamp > timeoutThreshold) {
-                    TickImpl.setInactive(tick);
                     this.timedOutHits++;
                 }
             }

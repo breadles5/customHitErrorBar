@@ -14,3 +14,13 @@ export const standardDeviation = (arr: number[]): number => {
     const avgSquareDiff = average(squareDiffs);
     return Math.sqrt(avgSquareDiff);
 };
+
+export const median = (arr: number[]): number => {
+    if (!arr || arr.length === 0) return 0;
+    const sortedArr = [...arr].sort((a, b) => a - b);
+    const middle = Math.floor(sortedArr.length / 2);
+    if (sortedArr.length % 2 === 0) {
+        return (sortedArr[middle - 1] + sortedArr[middle]) / 2;
+    }
+    return sortedArr[middle];
+};
