@@ -120,17 +120,19 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
         }
     } else {
         cache.tickPool.update(hitErrors);
-        updateTicks();
+        
+        // should help reduce updateTicks calls during map breaks
+        if (cache.tickPool.activeTicks.size > 0) {
+            updateTicks();
+        }
 
-        // Replace filter with direct access via activeTicks
         const activeErrors: number[] = [];
         for (const idx of cache.tickPool.activeTicks) {
             activeErrors.push(cache.tickPool.pool[idx].position >> 1);
         }
-        const averageError = activeErrors.reduce((a, b) => a + b, 0) / activeErrors.length;
-        updateArrow(median(activeErrors));
+        const medianError = median(activeErrors);
+        updateArrow(medianError);
         if (settings.showSD) {
-            // use activeErrors as is before modifying it
             const standardDeviationError = standardDeviation(activeErrors);
             const sdElement = getElement(".sd");
             if (sdElement) {
