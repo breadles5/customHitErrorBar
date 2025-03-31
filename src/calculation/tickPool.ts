@@ -111,6 +111,7 @@ export class TickPool {
         // this is also really efficient since we are NOT iterating over the entire hitErrors array
 
         // WAIT A SECOND WE'RE JUST USING THE PROCESSED HITS FROM THE PREVIOUS UPDATE
+        if (processedHits === hitErrors.length) return;
         for (let i = processedHits; i < hitErrors.length; i++) {
             const poolIndex = i % poolSize;
             const error = hitErrors[i];
