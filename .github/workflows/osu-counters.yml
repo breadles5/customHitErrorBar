@@ -33,7 +33,7 @@ jobs:
             - name: Checkout target repository
               uses: actions/checkout@v4
               with:
-                  repository: tosuapp/counters # Target repository
+                  repository: ${{ github.actor }}/counters # Checkout the user's fork
                   token: ${{ secrets.TARGET_REPO_PAT }} # PAT secret for authentication
                   path: deploy_target # Checkout to a temporary directory
 
@@ -86,7 +86,7 @@ jobs:
                   gh pr create \
                     --repo "$GH_REPO" \
                     --base "$BASE_BRANCH" \
-                    --head "$HEAD_BRANCH" \
+                    --head "${{ github.actor }}:$HEAD_BRANCH" \
                     --title "$PR_TITLE" \
                     --body "$PR_BODY"
               shell: bash
