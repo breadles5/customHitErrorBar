@@ -42,7 +42,7 @@ export const cache: cache = {
 };
 
 // Tosu WebSocket connection
-const DEFAULT_HOST = "127.0.0.1:24050";
+const DEFAULT_HOST = window.location.host;
 let wsManager = new WebSocketManager(DEFAULT_HOST);
 let currentHost = DEFAULT_HOST;
 // Initialize WebSocket connection
