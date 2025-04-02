@@ -66,7 +66,7 @@ jobs:
                     echo "changes_exist=true" >> $GITHUB_OUTPUT
                     git checkout -b $BRANCH_NAME
                     git commit -m "Update counters from build job ${{ github.run_id }} (${{ github.sha }})"
-                    git push --set-upstream origin $BRANCH_NAME
+                    git push --force --set-upstream origin $BRANCH_NAME # Force push to overwrite existing branch if needed
                   fi
               shell: bash
 
