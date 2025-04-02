@@ -15,17 +15,25 @@ const getArrowColor = (average: number): string => {
     return "var(--arrow-late)";
 };
 
-export function updateArrow(targetPosition: number) {
+export const updateArrow = (targetPosition: number): void => {
     if (arrow) {
-        // should allow for gpu acceleration?
-        arrow.style.transform = `translate3d(${targetPosition * 2}px, 0, 0)`;
+        // conditionally use hardware accelerated transform
+        if (settings.disableHardwareAcceleration) {
+            arrow.style.transform = `translateX(${targetPosition * 2}px)`;
+            return;
+        };
+        arrow.style.transform = `translate3d(${targetPosition * 2}px, 0px, 0px)`;
         arrow.style.borderTopColor = getArrowColor(targetPosition);
     }
 }
 
 export function resetArrow() {
     if (arrow) {
-        arrow.style.transform = "translateX(0px)";
         arrow.style.borderTopColor = "#fff";
+        if (settings.disableHardwareAcceleration) {
+            arrow.style.transform = "translateX(0px)";
+            return;
+        };
+        arrow.style.transform = "translate3d(0px, 0px, 0px)";
     }
 }

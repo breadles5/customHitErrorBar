@@ -1,5 +1,6 @@
 import { getElement } from "../rendering/elements"; // Only need getElement
 import { cache } from "../index";
+import { settings } from "../sockets/settings";
 
 // Module-level cache for tick DOM elements
 const tickElementsArray: HTMLElement[] = [];
@@ -35,7 +36,11 @@ export const resetTicks = (): void => {
         const tickElement = tickElementsArray[i];
         if (!tickElement) continue;
         tickElement.className = "tick inactive";
-        tickElement.style.transform = "translate3d(0px, 0, 0)";
+        if (settings.disableHardwareAcceleration) {
+            tickElement.style.transform = "translateX(0px)";
+            return;
+        }
+        tickElement.style.transform = "translate3d(0px, 0px, 0px)";
     }
 };
 
@@ -50,7 +55,11 @@ export const updateTicks = (): void => {
             // if you recall properly, ticks classNames and position are updated at once, so no need to make another check for position
             if (tick.classNames !== tickElement.className) {
                 tickElement.className = tick.classNames;
-                tickElement.style.transform = `translate3d(${tick.position}px, 0, 0)`;
+                if (settings.disableHardwareAcceleration) {
+                    tickElement.style.transform = `translateX(${tick.position}px)`;
+                    return;
+                }
+                tickElement.style.transform = `translate3d(${tick.position}px, 0px, 0px)`;
             }
         }
     })

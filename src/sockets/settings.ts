@@ -30,6 +30,7 @@ export const settings: Settings = {
     color0: "#000000",
     showSD: true,
     visible: true,
+    disableHardwareAcceleration: false,
 };
 // define root element
 const root = typeof document !== "undefined" ? document.documentElement : { style: { setProperty: () => {} } };
