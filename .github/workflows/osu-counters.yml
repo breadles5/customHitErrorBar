@@ -40,11 +40,12 @@ jobs:
             # Step 6: Copy build files to target repository
             - name: Copy build files
               run: |
-                  mkdir -p deploy_target/counters/customhiterrorbar # Ensure the target folder exists
+                  TARGET_DIR="deploy_target/counters/customhiterrorbar by breadles5"
+                  mkdir -p "$TARGET_DIR" # Ensure the target folder exists
                   echo "Cleaning target directory..."
-                  rm -rf deploy_target/counters/customhiterrorbar/*
+                  rm -rf "$TARGET_DIR"/* # Remove existing files
                   echo "Copying build files..."
-                  cp -r ./dist/* deploy_target/counters/customhiterrorbar/ # Copy build output
+                  cp -r ./dist/* "$TARGET_DIR"/ # Copy build output
               shell: bash
 
             # Step 7: Commit and push changes to a new branch in target repository
@@ -54,7 +55,7 @@ jobs:
                   cd deploy_target
                   git config user.name 'github-actions[bot]'
                   git config user.email 'github-actions[bot]@users.noreply.github.com'
-                  git add counters/customhiterrorbar/*
+                  git add "counters/customhiterrorbar by breadles5"/* # Add files from the correct directory
                   # Check if there are changes to commit to avoid empty commits
                   if git diff --staged --quiet --exit-code; then
                     echo "No changes detected in counters directory."
@@ -75,18 +76,20 @@ jobs:
               env:
                   GH_TOKEN: ${{ secrets.TARGET_REPO_PAT }} # Use the PAT for authentication
                   GH_REPO: tosuapp/counters # Target repository
-                  HEAD_BRANCH: ${{ steps.commit_push.outputs.branch }}
+                  HEAD_BRANCH: ${{ github.actor }}:${{ steps.commit_push.outputs.branch }} # Correct head branch format
                   BASE_BRANCH: main # Or the default branch of tOSUapp/counters
-                  PR_TITLE: "Update Counters from Build ${{ github.run_id }}"
+                  PR_TITLE: "new: custom hit error bar" # Set fixed PR title
+                  # --- Set fixed PR body with image URLs ---
                   PR_BODY: |
-                      Automated update of counter files from build job ${{ github.run_id }}.
-                      Triggered by commit: ${{ github.sha }} in ${{ github.repository }}
-                      Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+                    ![customhiterrorbar.png](https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/.github/assets/customhiterrorbar.png)
+                    ![customhiterrorbar.gif](https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/.github/assets/customhiterrorbar.gif)
+
+                    tosu
               run: |
                   gh pr create \
                     --repo "$GH_REPO" \
                     --base "$BASE_BRANCH" \
-                    --head "${{ github.actor }}:$HEAD_BRANCH" \
+                    --head "$HEAD_BRANCH" \
                     --title "$PR_TITLE" \
                     --body "$PR_BODY"
               shell: bash
