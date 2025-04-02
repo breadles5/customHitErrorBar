@@ -8,7 +8,7 @@ rewritten in typescript mostly from scratch, and designed to be easy to maintain
 
 ## Preview
 
-![preview](https://github.com/user-attachments/assets/c7d348e1-7984-4e7e-b20e-cfa61737b4f3)
+![preview](./.github/assets/customhiterrorbar.gif)
 
 ## Features
 

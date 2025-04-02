@@ -64,12 +64,14 @@ export class TickImpl implements Tick {
 
 export class TickPool {
     readonly PoolSize: number;
-    timedOutHits: number;
-    processedHits: number;
-    pool: TickImpl[];
+    private timedOutHits: number;
+    private processedHits: number;
+    readonly pool: TickImpl[]; // readonly doesnt prevent us from modifying the array, only from reassigning it
+    readonly activeTicks: Set<number> = new Set(); // Store indices of active ticks
 
     constructor() {
-        this.PoolSize = 50;
+        // TODO: add a setting for pool size
+        this.PoolSize = 100;
         this.timedOutHits = 0;
         this.processedHits = 0;
         this.pool = Array.from({ length: this.PoolSize }, () => new TickImpl());
@@ -79,34 +81,54 @@ export class TickPool {
         for (const tick of this.pool) {
             TickImpl.reset(tick);
         }
+        this.activeTicks.clear();
         this.timedOutHits = 0;
         this.processedHits = 0;
     }
 
     update(hitErrors: number[]) {
-        // Get current time once before the loop
         const now = Date.now();
         const timeoutThreshold = settings.tickDuration + settings.fadeOutDuration;
 
-        for (let i = this.timedOutHits; i < hitErrors.length; i++) {
-            const poolIndex = i % this.PoolSize;
-            const error = hitErrors[i];
-            const tick = this.pool[poolIndex];
+        // cache class properties here
+        const poolSize = this.PoolSize;
+        const pool = this.pool;
+        const activeTicks = this.activeTicks;
+        const processedHits = this.processedHits;
 
-            const processedHitsindex = this.processedHits - 1;
+        // Check timeouts only for active ticks
+        for (const idx of activeTicks) {
+            const tick = pool[idx];
+            if (now - tick.timestamp > timeoutThreshold) {
+                TickImpl.setInactive(tick);
+                activeTicks.delete(idx);
+            }
+        }
+
+        // Process new hits
+        // having an `inactiveTicks` set would be useless
+        // since we still neeed to access poolIndex AND the hitError of what should be the corresponding error
+        // this is also really efficient since we are NOT iterating over the entire hitErrors array
+
+        // WAIT A SECOND WE'RE JUST USING THE PROCESSED HITS FROM THE PREVIOUS UPDATE
+        if (processedHits === hitErrors.length) return;
+        for (let i = processedHits; i < hitErrors.length; i++) {
+            const poolIndex = i % poolSize;
+            const error = hitErrors[i];
+            const tick = pool[poolIndex];
+
+            // note: processedHits is a constant declaration referencing the value from the previous state
+            // we'll just update it class properties and create a new processedHits in memory on the next update() call.
+            
             if (!tick.active) {
                 TickImpl.setActive(tick, error);
+                activeTicks.add(poolIndex);
                 this.processedHits++;
             } else {
+                const processedHitsindex = processedHits - 1;
                 if (i > processedHitsindex) {
                     TickImpl.resetActive(tick, error);
                     this.processedHits++;
-                    this.timedOutHits++;
-                }
-                // Check for timeout using the cached 'now'
-                if (tick.active && now - tick.timestamp > timeoutThreshold) {
-                    TickImpl.setInactive(tick);
-                    this.timedOutHits++;
                 }
             }
         }

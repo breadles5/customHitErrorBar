@@ -29,6 +29,7 @@ export default defineConfig(({ mode }) => ({
                 main: resolve(__dirname, "index.html"),
             },
             output: {
+                banner: String("/*\n * find the original source code at https://github.com/breadles5/customhiterrorbar\n */"),
                 // Optimize chunk size
                 manualChunks: undefined,
                 // Prevent hash generation in filenames
@@ -39,7 +40,7 @@ export default defineConfig(({ mode }) => ({
         },
         target: "esnext",
         esbuild: {
-            legalComments: "none",
+            legalComments: "eof",
             treeShaking: true,
             minifyIdentifiers: mode.match(/production|development/),
             minifySyntax: mode.match(/production|development/),
@@ -69,18 +70,4 @@ export default defineConfig(({ mode }) => ({
             },
         },
     ],
-    // Worker bundling options
-    worker: {
-        format: "es",
-        rollupOptions: {
-            output: {
-                // Optimize chunk size
-                manualChunks: undefined,
-                // Prevent hash generation in filenames
-                entryFileNames: "[name].js",
-                chunkFileNames: "[name].js",
-                assetFileNames: "[name][extname]",
-            },
-        },
-    },
 }));

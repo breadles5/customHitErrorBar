@@ -90,7 +90,7 @@ body {
     border-top: var(--arrow-size) solid var(--arrow-perfect);
     transform: translate3d(0,0,0);
     opacity: 1;
-    will-change: transform opacity;
+    will-change: transform, opacity;
 }
 
 .colors-container,
@@ -166,12 +166,7 @@ body {
 }
 
 @keyframes fadeOut {
-    0% {
-        opacity: var(--tick-opacity);
-    }
-    100% {
-        opacity: 0;
-    }
+    to { opacity: 0; }
 }
 
 .tick {
@@ -180,7 +175,7 @@ body {
     height: var(--tick-height);
     border-radius: var(--tick-radius);
     transform: translate3d(0, 0, 0);
-    will-change: transform opacity;
+    will-change: transform, opacity;
     contain: layout paint style;
     opacity: var(--tick-opacity);
     z-index: 7;
