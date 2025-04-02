@@ -47,14 +47,37 @@ export interface CALCULATE_PP_RESPONSE {
     ppAccuracy: number;
     effectiveMissCount: number;
 }
-export interface WebSocketCommandMessage extends Partial<Settings> {
-    error?: string;
-    websocketUrl?: string;
+
+export interface Settings {
+    TimingWindowOpacity: number;
+    barHeight: number;
+    barWidth: number;
+    colorBar: string;
+    tickWidth: number;
+    tickHeight: number;
+    tickDuration: number;
+    tickOpacity: number;
+    fadeOutDuration: number;
+    arrowSize: number;
+    perfectArrowThreshold: number;
+    colorArrowEarly: string;
+    colorArrowLate: string;
+    colorArrowPerfect: string;
+    timingWindowHeight: number;
+    isRounded: number;
+    color300g: string;
+    color300: string;
+    color200: string;
+    color100: string;
+    color50: string;
+    color0: string;
+    showSD: boolean;
+    visible: boolean;
 }
 
 export interface CommandData {
     command: string;
-    message: WebSocketCommandMessage;
+    message: Settings;
 }
 
 export interface WEBSOCKET_V2 {
@@ -709,30 +732,4 @@ export interface WEBSOCKET_V2_PRECISE {
             };
         };
     };
-}
-export interface Settings {
-    TimingWindowOpacity: number;
-    barHeight: number;
-    barWidth: number;
-    colorBar: string;
-    tickWidth: number;
-    tickHeight: number;
-    tickDuration: number;
-    tickOpacity: number;
-    fadeOutDuration: number;
-    arrowSize: number;
-    perfectArrowThreshold: number;
-    colorArrowEarly: string;
-    colorArrowLate: string;
-    colorArrowPerfect: string;
-    timingWindowHeight: number;
-    isRounded: number;
-    color300g: string;
-    color300: string;
-    color200: string;
-    color100: string;
-    color50: string;
-    color0: string;
-    showSD: boolean;
-    visible: boolean;
 }
