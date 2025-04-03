@@ -5,6 +5,7 @@ import { settings } from "../sockets/settings";
 // Module-level cache for tick DOM elements
 const tickElementsArray: HTMLElement[] = [];
 let areTicksRendered = false; // Flag to indicate if initial render is done
+const disableHardwareAcceleration = settings.disableHardwareAcceleration;
 
 export const renderTicksOnLoad = (): void => {
     if (areTicksRendered) return; // Prevent re-rendering
@@ -36,7 +37,7 @@ export const resetTicks = (): void => {
         const tickElement = tickElementsArray[i];
         if (!tickElement) continue;
         tickElement.className = "tick inactive";
-        if (settings.disableHardwareAcceleration) {
+        if (disableHardwareAcceleration) {
             tickElement.style.transform = "translateX(0px)";
             return;
         }
@@ -55,7 +56,7 @@ export const updateTicks = (): void => {
             // if you recall properly, ticks classNames and position are updated at once, so no need to make another check for position
             if (tick.classNames !== tickElement.className) {
                 tickElement.className = tick.classNames;
-                if (settings.disableHardwareAcceleration) {
+                if (disableHardwareAcceleration) {
                     tickElement.style.transform = `translateX(${tick.position}px)`;
                     return;
                 }
