@@ -55,8 +55,6 @@ jobs:
                   cd deploy_target
                   git config user.name 'github-actions[bot]'
                   git config user.email 'github-actions[bot]@users.noreply.github.com'
-                  git fetch origin master
-                  git reset --hard origin/master
                   git add "counters/customhiterrorbar by breadles5"/* # Add files from the correct directory
                   # Check if there are changes to commit to avoid empty commits
                   if git diff --staged --quiet --exit-code; then
