@@ -43,7 +43,7 @@ export class TickImpl implements Tick {
     }
 
     static setClassNames(tick: TickImpl) {
-        const timingWindows = cache.timingWindows;
+        const { timingWindows } = cache;
         tick.classNames = "tick";
 
         const hitError = Math.abs(tick.position >> 1);
@@ -85,7 +85,8 @@ export class TickPool {
 
     update(hitErrors: number[]) {
         const now = Date.now();
-        const timeoutThreshold = settings.tickDuration + settings.fadeOutDuration;
+        const { tickDuration, fadeOutDuration } = settings;
+        const timeoutThreshold = tickDuration + fadeOutDuration;
 
         // cache class properties here
         const poolSize = this.PoolSize;
