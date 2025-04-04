@@ -20,8 +20,9 @@ jobs:
               uses: actions/setup-node@v4
               with:
                   node-version: "20" # Adjust to your project's Node.js version
+                  cache: 'npm' # Enable npm dependency caching
 
-            # Step 3: Install dependencies
+            # Step 3: Install dependencies (uses cache if available)
             - name: Install dependencies
               run: npm install
 
@@ -37,7 +38,26 @@ jobs:
                   token: ${{ secrets.TARGET_REPO_PAT }} # PAT secret for authentication
                   path: deploy_target # Checkout to a temporary directory
 
-            # Step 6: Copy build files to target repository
+            # Step 6: Sync target repo with upstream (runs inside deploy_target)
+            - name: Sync target repository with upstream
+              working-directory: deploy_target # Set working directory for this step
+              run: |
+                git config user.name 'github-actions[bot]'
+                git config user.email 'github-actions[bot]@users.noreply.github.com'
+                echo "Adding upstream remote..."
+                # Add upstream if it doesn't exist
+                git remote add upstream https://github.com/tosuapp/counters.git || echo "Upstream remote already exists."
+                echo "Fetching upstream main branch..."
+                git fetch upstream main
+                echo "Merging upstream/main into current branch (master)..."
+                # Merge upstream/main into the current branch (should be master).
+                # Fail the workflow if merge conflicts occur.
+                git merge upstream/main -m "Merge upstream/main into master"
+                # No push needed here; the commit step will push the merged changes + new build files to a new branch.
+              shell: bash
+
+
+            # Step 7: Copy build files to target repository
             - name: Copy build files
               run: |
                   TARGET_DIR="deploy_target/counters/customhiterrorbar by breadles5"
@@ -48,25 +68,48 @@ jobs:
                   cp -r ./dist/* "$TARGET_DIR"/ # Copy build output
               shell: bash
 
-            # Step 7: Commit and push changes directly to master branch
-            - name: Commit and push changes to master
+            # Step 8: Commit and push changes to a new branch in the fork
+            - name: Commit and push changes to new branch
               id: commit_push
+              working-directory: deploy_target # Set working directory for this step
               run: |
-                  cd deploy_target
+                  # Configure git user
                   git config user.name 'github-actions[bot]'
                   git config user.email 'github-actions[bot]@users.noreply.github.com'
-                  git add "counters/customhiterrorbar by breadles5"/* # Add files from the correct directory
-                  # Always commit and push changes
-                  git commit -m "Update counters from build job ${{ github.run_id }} (${{ github.sha }})" || echo "No changes to commit" # Commit changes, ignore error if no changes
-                  git push origin master --force # Force push to master
+
+                  # Define a unique branch name for this update
+                  BRANCH_NAME="ci-update-${{ github.run_id }}-${{ github.sha }}"
+                  echo "Creating and checking out branch: $BRANCH_NAME"
+                  git checkout -b $BRANCH_NAME
+
+                  # Add the updated counter files
+                  git add "counters/customhiterrorbar by breadles5"/*
+
+                  # Commit changes if any exist
+                  # Use 'git diff --staged --quiet' to check for staged changes
+                  if ! git diff --staged --quiet; then
+                    echo "Committing changes..."
+                    git commit -m "Update counters from build job ${{ github.run_id }} (${{ github.sha }})"
+                    echo "Pushing branch $BRANCH_NAME to origin..."
+                    # Push the new branch to the fork repository (origin)
+                    git push origin $BRANCH_NAME
+                  else
+                    echo "No changes to commit."
+                  fi
+
+                  # Output the branch name for the PR step
+                  echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
               shell: bash
 
-            # Step 8: Create Pull Request using GitHub CLI
-            - name: Create Pull Request using GitHub CLI # Removed conditional execution
+            # Step 9: Create Pull Request using GitHub CLI from the new branch
+            - name: Create Pull Request using GitHub CLI
+              # Only run if the commit_push step actually created a branch (i.e., had changes)
+              if: steps.commit_push.outputs.branch_name
               env:
                   GH_TOKEN: ${{ secrets.TARGET_REPO_PAT }} # Use the PAT for authentication
                   GH_REPO: tosuapp/counters # Target repository
-                  HEAD_BRANCH: ${{ github.actor }}:master # Use master branch as head
+                  # Use the dynamically created branch name from the previous step
+                  HEAD_BRANCH: ${{ github.actor }}:${{ steps.commit_push.outputs.branch_name }}
                   BASE_BRANCH: main # Or the default branch of tOSUapp/counters
                   PR_TITLE: "new: custom hit error bar" # Set fixed PR title
                   # --- Set fixed PR body with image URLs ---
