@@ -75,7 +75,7 @@ jobs:
               env:
                   GH_TOKEN: ${{ secrets.TARGET_REPO_PAT }} # Use the PAT for authentication
                   GH_REPO: tosuapp/counters # Target repository
-                  HEAD_BRANCH: ${{ github.actor }}:${{ steps.commit_push.outputs.branch }} # Correct head branch format
+                  HEAD_BRANCH: ${{ github.actor }}:master # Use master branch as head
                   BASE_BRANCH: main # Or the default branch of tOSUapp/counters
                   PR_TITLE: "new: custom hit error bar" # Set fixed PR title
                   # --- Set fixed PR body with image URLs ---
