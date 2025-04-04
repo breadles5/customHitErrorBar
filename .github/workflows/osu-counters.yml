@@ -56,20 +56,13 @@ jobs:
                   git config user.name 'github-actions[bot]'
                   git config user.email 'github-actions[bot]@users.noreply.github.com'
                   git add "counters/customhiterrorbar by breadles5"/* # Add files from the correct directory
-                  # Check if there are changes to commit to avoid empty commits
-                  if git diff --staged --quiet --exit-code; then
-                    echo "No changes detected in counters directory."
-                    echo "changes_exist=false" >> $GITHUB_OUTPUT
-                  else
-                    git commit -m "Update counters from build job ${{ github.run_id }} (${{ github.sha }})"
-                    git push origin master --force # Force push to master
-                    echo "changes_exist=true" >> $GITHUB_OUTPUT
-                  fi
+                  # Always commit and push changes
+                  git commit -m "Update counters from build job ${{ github.run_id }} (${{ github.sha }})" || echo "No changes to commit" # Commit changes, ignore error if no changes
+                  git push origin master --force # Force push to master
               shell: bash
 
             # Step 8: Create Pull Request using GitHub CLI
-            - name: Create Pull Request using GitHub CLI
-              if: steps.commit_push.outputs.changes_exist == 'true' # Only run if changes were pushed
+            - name: Create Pull Request using GitHub CLI # Removed conditional execution
               env:
                   GH_TOKEN: ${{ secrets.TARGET_REPO_PAT }} # Use the PAT for authentication
                   GH_REPO: tosuapp/counters # Target repository
