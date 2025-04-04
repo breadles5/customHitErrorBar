@@ -4,8 +4,9 @@ import { settings } from "../sockets/settings";
 
 // Module-level cache for tick DOM elements
 const tickElementsArray: HTMLElement[] = [];
+const lastAppliedX: number[] = []; // Tracks the last applied X transform value
 let areTicksRendered = false; // Flag to indicate if initial render is done
-const disableHardwareAcceleration = settings.disableHardwareAcceleration;
+const { disableHardwareAcceleration } = settings;
 
 export const renderTicksOnLoad = (): void => {
     if (areTicksRendered) return; // Prevent re-rendering
@@ -17,6 +18,7 @@ export const renderTicksOnLoad = (): void => {
     }
     const fragment = document.createDocumentFragment();
     tickElementsArray.length = 0; // Clear array (safety for potential future re-renders)
+    lastAppliedX.length = 0; // Clear the tracking array as well
 
     for (let i = 0; i < cache.tickPool.PoolSize; i++) { // Use PoolSize for consistency
         const div = document.createElement("div");
@@ -24,6 +26,7 @@ export const renderTicksOnLoad = (): void => {
         // div.id = `${i}`; // Optional
         fragment.appendChild(div);
         tickElementsArray.push(div); // Store reference directly
+        lastAppliedX.push(Number.NaN); // Initialize with a value that won't match 0 initially
     }
     container.appendChild(fragment);
     areTicksRendered = true; // Set flag after elements are added
@@ -37,11 +40,12 @@ export const resetTicks = (): void => {
         const tickElement = tickElementsArray[i];
         if (!tickElement) continue;
         tickElement.className = "tick inactive";
-        if (disableHardwareAcceleration) {
-            tickElement.style.transform = "translateX(0px)";
-            return;
+        // Reset transform and tracked value
+        const initialTransform = disableHardwareAcceleration ? "translateX(0px)" : "translate3d(0px, 0px, 0px)";
+        if (tickElement.style.transform !== initialTransform) {
+            tickElement.style.transform = initialTransform;
         }
-        tickElement.style.transform = "translate3d(0px, 0px, 0px)";
+        lastAppliedX[i] = 0; // Reset tracked position to 0
     }
 };
 
@@ -53,14 +57,25 @@ export const updateTicks = (): void => {
             const tick = cache.tickPool.pool[i];
             const tickElement = tickElementsArray[i]; // Direct access
     
-            // if you recall properly, ticks classNames and position are updated at once, so no need to make another check for position
+            // Update class name if needed
             if (tick.classNames !== tickElement.className) {
                 tickElement.className = tick.classNames;
-                if (disableHardwareAcceleration) {
-                    tickElement.style.transform = `translateX(${tick.position}px)`;
-                    return;
+            }
+
+            // Update transform only if the position has actually changed
+            const targetX = tick.position;
+            const lastX = lastAppliedX[i];
+
+            if (targetX !== lastX) {
+                const newTransform = disableHardwareAcceleration
+                    ? `translateX(${targetX}px)`
+                    : `translate3d(${targetX}px, 0px, 0px)`;
+                
+                // Check current style to potentially avoid setting the same value (minor optimization)
+                if (tickElement.style.transform !== newTransform) {
+                    tickElement.style.transform = newTransform;
                 }
-                tickElement.style.transform = `translate3d(${tick.position}px, 0px, 0px)`;
+                lastAppliedX[i] = targetX; // Update the tracked value
             }
         }
     })
