@@ -3,8 +3,7 @@ import { settings } from "../sockets/settings";
 
 // Animation functions
 const arrow = getElement(".arrow");
-const disableHardwareAcceleration = settings.disableHardwareAcceleration
-const perfectArrowThreshold = settings.perfectArrowThreshold;
+const { perfectArrowThreshold, disableHardwareAcceleration } = settings;
 
 const getArrowColor = (average: number): string => {
     const absError = Math.abs(average);
