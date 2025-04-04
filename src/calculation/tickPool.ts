@@ -64,7 +64,6 @@ export class TickImpl implements Tick {
 
 export class TickPool {
     readonly PoolSize: number;
-    private timedOutHits: number;
     private processedHits: number;
     readonly pool: TickImpl[]; // readonly doesnt prevent us from modifying the array, only from reassigning it
     readonly activeTicks: Set<number> = new Set(); // Store indices of active ticks
@@ -72,7 +71,6 @@ export class TickPool {
     constructor() {
         // TODO: add a setting for pool size
         this.PoolSize = 100;
-        this.timedOutHits = 0;
         this.processedHits = 0;
         this.pool = Array.from({ length: this.PoolSize }, () => new TickImpl());
     }
@@ -82,7 +80,6 @@ export class TickPool {
             TickImpl.reset(tick);
         }
         this.activeTicks.clear();
-        this.timedOutHits = 0;
         this.processedHits = 0;
     }
 

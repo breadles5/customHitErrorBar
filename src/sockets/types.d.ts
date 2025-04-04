@@ -72,7 +72,7 @@ export interface Settings {
     color50: string;
     color0: string;
     showSD: boolean;
-    visible: boolean;
+    disableHardwareAcceleration: boolean;
 }
 
 export interface CommandData {

@@ -34,28 +34,30 @@ export const clearSD = (): void => {
 
 // Update timing window display in the DOM
 export function updateTimingWindowElements() {
-    const timingWindows = cache.timingWindows;
-    const colorsContainer = getElement(".colors-container");
+    requestAnimationFrame(() => {
+        const timingWindows = cache.timingWindows;
+        const colorsContainer = getElement(".colors-container");
 
-    // Clear existing timing windows
-    if (colorsContainer) {
-        colorsContainer.innerHTML = "";
-    }
+        // Clear existing timing windows
+        if (colorsContainer) {
+            colorsContainer.innerHTML = "";
+        }
 
-    // Set container widths based on miss window (0)
-    const containerWidth = Math.abs(timingWindows.get("0") ?? 0) * 4;
-    document.documentElement.style.setProperty("--container-width", `${containerWidth}px`);
+        // Set container widths based on miss window (0)
+        const containerWidth = Math.abs(timingWindows.get("0") ?? 0) * 4;
+        document.documentElement.style.setProperty("--container-width", `${containerWidth}px`);
 
-    // Helper function to create timing window element
-    const createTimingWindow = (grade: string, width: number): HTMLElement => {
-        const div = document.createElement("div");
-        div.className = `timing-window-${grade}`;
-        div.style.width = `${Math.abs(width * 4)}px`;
-        return div;
-    };
-    const fragment = document.createDocumentFragment();
-    timingWindows.forEach((width, grade) => {
-        fragment.appendChild(createTimingWindow(String(grade), width));
+        // Helper function to create timing window element
+        const createTimingWindow = (grade: string, width: number): HTMLElement => {
+            const div = document.createElement("div");
+            div.className = `timing-window-${grade}`;
+            div.style.width = `${Math.abs(width * 4)}px`;
+            return div;
+        };
+        const fragment = document.createDocumentFragment();
+        timingWindows.forEach((width, grade) => {
+            fragment.appendChild(createTimingWindow(String(grade), width));
+        });
+        colorsContainer?.appendChild(fragment);
     });
-    colorsContainer?.appendChild(fragment);
 }

@@ -28,8 +28,8 @@ export const settings: Settings = {
     color100: "#000000",
     color50: "#000000",
     color0: "#000000",
-    showSD: true,
-    visible: true,
+    showSD: false,
+    disableHardwareAcceleration: false,
 };
 // define root element
 const root = typeof document !== "undefined" ? document.documentElement : { style: { setProperty: () => {} } };
@@ -51,7 +51,8 @@ export const updateSettings = (message: Partial<Settings>) => {
     let hasLayoutChanges = false;
 
     for (const [key, value] of Object.entries(message)) {
-        if (Object.prototype.hasOwnProperty.call(settings, key) && settings[<keyof Settings>key] !== value) {
+        const typedKey = key as keyof Settings;
+        if (Object.prototype.hasOwnProperty.call(settings, typedKey) && settings[typedKey] !== value) {
             settings[<keyof Settings>key] = <never>value;
 
             // Track what kind of changes occurred
@@ -59,6 +60,11 @@ export const updateSettings = (message: Partial<Settings>) => {
                 hasVisualChanges = true;
             } else if (key !== "showSD") {
                 hasLayoutChanges = true;
+            }
+
+            // Specifically check for hardware acceleration change
+            if (typedKey === "disableHardwareAcceleration") {
+                updateHardwareAcceleration(); // Update immediately
             }
         }
     }
@@ -74,6 +80,17 @@ export const updateSettings = (message: Partial<Settings>) => {
     // Update visibility if needed
     if (Object.prototype.hasOwnProperty.call(message, "showSD") && oldSettings.showSD !== message.showSD) {
         updateVisibility();
+    }
+};
+
+// Function to specifically update hardware acceleration CSS variables
+const updateHardwareAcceleration = () => {
+    if (settings.disableHardwareAcceleration) {
+        root.style.setProperty("--transform-prop", "none");
+        root.style.setProperty("--will-change-prop", "auto"); // Use 'auto' or 'opacity' if only opacity changes
+    } else {
+        root.style.setProperty("--transform-prop", "translate3d(0,0,0)");
+        root.style.setProperty("--will-change-prop", "transform, opacity");
     }
 };
 
@@ -139,4 +156,6 @@ export const updateCSSVariables = () => {
     updateCSSLayout();
     // Update color variables
     updateCSSColors();
+    // Update hardware acceleration settings
+    updateHardwareAcceleration();
 };

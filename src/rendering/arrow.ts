@@ -3,9 +3,12 @@ import { settings } from "../sockets/settings";
 
 // Animation functions
 const arrow = getElement(".arrow");
+const disableHardwareAcceleration = settings.disableHardwareAcceleration
+const perfectArrowThreshold = settings.perfectArrowThreshold;
+
 const getArrowColor = (average: number): string => {
     const absError = Math.abs(average);
-    const threshold = settings.perfectArrowThreshold;
+    const threshold = perfectArrowThreshold;
     if (absError <= threshold) {
         return "var(--arrow-perfect)";
     }
@@ -15,17 +18,25 @@ const getArrowColor = (average: number): string => {
     return "var(--arrow-late)";
 };
 
-export function updateArrow(targetPosition: number) {
+export const updateArrow = (targetPosition: number): void => {
     if (arrow) {
-        // should allow for gpu acceleration?
-        arrow.style.transform = `translate3d(${targetPosition * 2}px, 0, 0)`;
+        // conditionally use hardware accelerated transform
+        if (disableHardwareAcceleration) {
+            arrow.style.transform = `translateX(${targetPosition * 2}px)`;
+            return;
+        };
+        arrow.style.transform = `translate3d(${targetPosition * 2}px, 0px, 0px)`;
         arrow.style.borderTopColor = getArrowColor(targetPosition);
     }
 }
 
 export function resetArrow() {
     if (arrow) {
-        arrow.style.transform = "translateX(0px)";
         arrow.style.borderTopColor = "#fff";
+        if (disableHardwareAcceleration) {
+            arrow.style.transform = "translateX(0px)";
+            return;
+        };
+        arrow.style.transform = "translate3d(0px, 0px, 0px)";
     }
 }

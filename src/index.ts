@@ -61,6 +61,23 @@ wsManager.commands((data: CommandData) => {
     }
 });
 
+// Handle background color URL parameter
+const urlParams = new URLSearchParams(window.location.search);
+const bgColor = urlParams.get('bg');
+if (bgColor) {
+  document.body.style.backgroundColor = bgColor;
+}
+
+if (settings.showSD) {
+    const container = getElement("#container");
+    if (container) {
+        const sd = document.createElement("div");
+        sd.classList.add("sd");
+        sd.innerText = "0.00";
+        container.appendChild(sd);
+    }
+}
+
 // Handle game state and menu updates
 const apiV2Filters = ["state", "play", "beatmap"];
 wsManager.api_v2((data: WEBSOCKET_V2) => {
