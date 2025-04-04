@@ -61,13 +61,6 @@ wsManager.commands((data: CommandData) => {
     }
 });
 
-// Handle background color URL parameter
-const urlParams = new URLSearchParams(window.location.search);
-const bgColor = urlParams.get('bg');
-if (bgColor) {
-  document.body.style.backgroundColor = bgColor;
-}
-
 if (settings.showSD) {
     const container = getElement("#container");
     if (container) {
