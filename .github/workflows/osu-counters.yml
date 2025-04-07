@@ -15,26 +15,29 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            # Step 2: Set up Node.js
-            - name: Set up Node.js
+            # Step 2: Set up pnpm
+            - name: Set up pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 10
+                  run_install: true
+
+            # Step 3: Install Node.js
+            - name: Install Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: "20" # Adjust to your project's Node.js version
-                  cache: 'pnpm' # Enable pnpm dependency caching
+                node-version: 20
+                cache: 'pnpm'
 
-            # Step 2.1: Set up pnpm
-            - name: Set up pnpm
-              run: npm install -g pnpm@8
-
-            # Step 3: Install dependencies (uses cache if available)
+            # Step 4: Install dependencies (uses cache if available)
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
 
-            # Step 4: Build the project
+            # Step 5: Build the project
             - name: Build the project
               run: pnpm run build:ci
 
-            # Step 5: Checkout target repository
+            # Step 6: Checkout target repository
             - name: Checkout target repository
               uses: actions/checkout@v4
               with:
@@ -42,7 +45,7 @@ jobs:
                   token: ${{ secrets.TARGET_REPO_PAT }} # PAT secret for authentication
                   path: deploy_target # Checkout to a temporary directory
 
-            # Step 6: Sync target repo with upstream (runs inside deploy_target)
+            # Step 7: Sync target repo with upstream (runs inside deploy_target)
             - name: Sync target repository with upstream
               working-directory: deploy_target # Set working directory for this step
               run: |
@@ -61,7 +64,7 @@ jobs:
               shell: bash
 
 
-            # Step 7: Copy build files to target repository
+            # Step 8: Copy build files to target repository
             - name: Copy build files
               run: |
                   TARGET_DIR="deploy_target/counters/customhiterrorbar by breadles5"
@@ -72,7 +75,7 @@ jobs:
                   cp -r ./dist/* "$TARGET_DIR"/ # Copy build output
               shell: bash
 
-            # Step 8: Commit and push changes to a new branch in the fork
+            # Step 9: Commit and push changes to a new branch in the fork
             - name: Commit and push changes to new branch
               id: commit_push
               working-directory: deploy_target # Set working directory for this step
@@ -105,7 +108,7 @@ jobs:
                   echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
               shell: bash
 
-            # Step 9: Create Pull Request using GitHub CLI from the new branch
+            # Step 10: Create Pull Request using GitHub CLI from the new branch
             - name: Create Pull Request using GitHub CLI
               # Only run if the commit_push step actually created a branch (i.e., had changes)
               if: steps.commit_push.outputs.branch_name
