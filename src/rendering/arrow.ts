@@ -3,28 +3,10 @@ import { settings } from "../sockets/settings";
 
 // Cache DOM element and settings
 const arrow = getElement(".arrow");
-let cachedSettings = {
-    perfectArrowThreshold: settings.perfectArrowThreshold,
-    disableHardwareAcceleration: settings.disableHardwareAcceleration,
-};
-
-export const loadArrowSettings = () => {
-    // Update cached settings
-    cachedSettings = {
-        perfectArrowThreshold: settings.perfectArrowThreshold,
-        disableHardwareAcceleration: settings.disableHardwareAcceleration,
-    };
-    for (const [key, value] of Object.entries(cachedSettings)) {
-        console.log(`[ARROW_SETTINGS] ${key}: ${value}`);
-    }
-    return cachedSettings;
-};
-
-const { perfectArrowThreshold, disableHardwareAcceleration } = cachedSettings;
 
 const getArrowColor = (average: number): string => {
     const absError = Math.abs(average);
-    if (absError <= perfectArrowThreshold) {
+    if (absError <= settings.perfectArrowThreshold) {
         return "var(--arrow-perfect)";
     }
     if (average < 0) {
@@ -36,7 +18,7 @@ const getArrowColor = (average: number): string => {
 export const updateArrow = (targetPosition: number): void => {
     if (arrow) {
         // conditionally use hardware accelerated transform
-        if (disableHardwareAcceleration) {
+        if (settings.disableHardwareAcceleration) {
             arrow.style.transform = `translateX(${targetPosition * 2}px)`;
             return;
         }
@@ -48,7 +30,7 @@ export const updateArrow = (targetPosition: number): void => {
 export function resetArrow() {
     if (arrow) {
         arrow.style.borderTopColor = "#fff";
-        if (disableHardwareAcceleration) {
+        if (settings.disableHardwareAcceleration) {
             arrow.style.transform = "translateX(0px)";
             return;
         }

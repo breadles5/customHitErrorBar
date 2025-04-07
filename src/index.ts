@@ -9,7 +9,7 @@ import {
 } from "./rendering/elements";
 import { calculateModTimingWindows } from "./calculation/timingWindows";
 import { renderTicksOnLoad, updateTicks } from "./rendering/ticks";
-import { loadArrowSettings, updateArrow } from "./rendering/arrow";
+import { updateArrow } from "./rendering/arrow";
 import { TickPool } from "./calculation/tickPool";
 import { reset } from "./rendering/reset";
 import { median, standardDeviation } from "./calculation/statistics";
@@ -51,7 +51,6 @@ wsManager.commands((data: CommandData) => {
 
         if (command === "getSettings") {
             updateSettings(message);
-            loadArrowSettings();
         }
     } catch (error) {
         // this is still needed for debugging
