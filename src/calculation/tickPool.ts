@@ -126,7 +126,7 @@ export class TickPool {
 
             // note: processedHits is a constant declaration referencing the value from the previous state
             // we'll just update it class properties and create a new processedHits in memory on the next update() call.
-            
+
             if (!tick.active) {
                 TickImpl.setActive(tick, error);
                 activeTicks.add(poolIndex);

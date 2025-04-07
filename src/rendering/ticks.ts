@@ -20,7 +20,8 @@ export const renderTicksOnLoad = (): void => {
     tickElementsArray.length = 0; // Clear array (safety for potential future re-renders)
     lastAppliedX.length = 0; // Clear the tracking array as well
 
-    for (let i = 0; i < cache.tickPool.PoolSize; i++) { // Use PoolSize for consistency
+    for (let i = 0; i < cache.tickPool.PoolSize; i++) {
+        // Use PoolSize for consistency
         const div = document.createElement("div");
         div.className = "tick inactive";
         // div.id = `${i}`; // Optional
@@ -52,11 +53,11 @@ export const resetTicks = (): void => {
 export const updateTicks = (): void => {
     requestAnimationFrame(() => {
         const poolSize = cache.tickPool.PoolSize;
-    
+
         for (let i = 0; i < poolSize; i++) {
             const tick = cache.tickPool.pool[i];
             const tickElement = tickElementsArray[i]; // Direct access
-    
+
             // Update class name if needed
             if (tick.classNames !== tickElement.className) {
                 tickElement.className = tick.classNames;
@@ -70,7 +71,7 @@ export const updateTicks = (): void => {
                 const newTransform = disableHardwareAcceleration
                     ? `translateX(${targetX}px)`
                     : `translate3d(${targetX}px, 0px, 0px)`;
-                
+
                 // Check current style to potentially avoid setting the same value (minor optimization)
                 if (tickElement.style.transform !== newTransform) {
                     tickElement.style.transform = newTransform;
@@ -78,5 +79,5 @@ export const updateTicks = (): void => {
                 lastAppliedX[i] = targetX; // Update the tracked value
             }
         }
-    })
+    });
 };

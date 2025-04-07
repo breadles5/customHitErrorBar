@@ -1,4 +1,3 @@
-
 import WebSocketManager from "./sockets/socket";
 import type { CommandData, WEBSOCKET_V2, WEBSOCKET_V2_PRECISE } from "./sockets/types";
 import { settings, updateSettings, getSettings } from "./sockets/settings";
@@ -6,8 +5,6 @@ import {
     updateTimingWindowElements,
     setHidden,
     setVisible,
-    elementCache,
-    getAllElements,
     getElement,
 } from "./rendering/elements";
 import { calculateModTimingWindows } from "./calculation/timingWindows";
@@ -116,7 +113,7 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
         }
     } else {
         cache.tickPool.update(hitErrors);
-        
+
         // should help reduce updateTicks calls during map breaks
         if (cache.tickPool.activeTicks.size > 0) {
             updateTicks();
@@ -131,7 +128,7 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
         for (const idx of cache.tickPool.nonFadeOutTicks) {
             nonFadeOutErrors.push(cache.tickPool.pool[idx].position >> 1);
         }
-        
+
         const medianError = median(nonFadeOutErrors);
         updateArrow(medianError);
         if (settings.showSD) {

@@ -5,14 +5,14 @@ import { settings } from "../sockets/settings";
 const arrow = getElement(".arrow");
 let cachedSettings = {
     perfectArrowThreshold: settings.perfectArrowThreshold,
-    disableHardwareAcceleration: settings.disableHardwareAcceleration
+    disableHardwareAcceleration: settings.disableHardwareAcceleration,
 };
 
 export const loadArrowSettings = () => {
     // Update cached settings
     cachedSettings = {
         perfectArrowThreshold: settings.perfectArrowThreshold,
-        disableHardwareAcceleration: settings.disableHardwareAcceleration
+        disableHardwareAcceleration: settings.disableHardwareAcceleration,
     };
     for (const [key, value] of Object.entries(cachedSettings)) {
         console.log(`[ARROW_SETTINGS] ${key}: ${value}`);
@@ -39,11 +39,11 @@ export const updateArrow = (targetPosition: number): void => {
         if (disableHardwareAcceleration) {
             arrow.style.transform = `translateX(${targetPosition * 2}px)`;
             return;
-        };
+        }
         arrow.style.transform = `translate3d(${targetPosition * 2}px, 0px, 0px)`;
         arrow.style.borderTopColor = getArrowColor(targetPosition);
     }
-}
+};
 
 export function resetArrow() {
     if (arrow) {
@@ -51,7 +51,7 @@ export function resetArrow() {
         if (disableHardwareAcceleration) {
             arrow.style.transform = "translateX(0px)";
             return;
-        };
+        }
         arrow.style.transform = "translate3d(0px, 0px, 0px)";
     }
 }
