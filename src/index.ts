@@ -119,11 +119,6 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
             updateTicks();
         }
 
-        const activeErrors: number[] = [];
-        for (const idx of cache.tickPool.activeTicks) {
-            activeErrors.push(cache.tickPool.pool[idx].position >> 1);
-        }
-
         const nonFadeOutErrors: number[] = [];
         for (const idx of cache.tickPool.nonFadeOutTicks) {
             nonFadeOutErrors.push(cache.tickPool.pool[idx].position >> 1);
