@@ -24,9 +24,7 @@ jobs:
 
             # Step 2.1: Set up pnpm
             - name: Set up pnpm
-              uses: pnpm/action-setup@v3
-              with:
-                version: 8 # Or specify the version used in your project
+              run: npm install -g pnpm@8
 
             # Step 3: Install dependencies (uses cache if available)
             - name: Install dependencies
