@@ -66,7 +66,8 @@ export class TickPool {
     readonly PoolSize: number;
     private processedHits: number;
     readonly pool: TickImpl[]; // readonly doesnt prevent us from modifying the array, only from reassigning it
-    readonly activeTicks: Set<number> = new Set(); // Store indices of active ticks
+    readonly activeTicks: Set<number> = new Set(); // Store indices of active ticks'
+    readonly nonFadeOutTicks: Set<number> = new Set(); // Store indices of visible ticks
 
     constructor() {
         // TODO: add a setting for pool size
@@ -80,6 +81,7 @@ export class TickPool {
             TickImpl.reset(tick);
         }
         this.activeTicks.clear();
+        this.nonFadeOutTicks.clear();
         this.processedHits = 0;
     }
 
@@ -92,6 +94,7 @@ export class TickPool {
         const poolSize = this.PoolSize;
         const pool = this.pool;
         const activeTicks = this.activeTicks;
+        const nonFadeOutTicks = this.nonFadeOutTicks;
         const processedHits = this.processedHits;
 
         // Check timeouts only for active ticks
@@ -103,6 +106,12 @@ export class TickPool {
             }
         }
 
+        for (const idx of nonFadeOutTicks) {
+            const tick = pool[idx];
+            if (now - tick.timestamp > tickDuration) {
+                nonFadeOutTicks.delete(idx);
+            }
+        }
         // Process new hits
         // having an `inactiveTicks` set would be useless
         // since we still neeed to access poolIndex AND the hitError of what should be the corresponding error
@@ -121,6 +130,7 @@ export class TickPool {
             if (!tick.active) {
                 TickImpl.setActive(tick, error);
                 activeTicks.add(poolIndex);
+                nonFadeOutTicks.add(poolIndex);
                 this.processedHits++;
             } else {
                 const processedHitsindex = processedHits - 1;

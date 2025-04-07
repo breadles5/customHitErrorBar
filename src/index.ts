@@ -126,10 +126,16 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
         for (const idx of cache.tickPool.activeTicks) {
             activeErrors.push(cache.tickPool.pool[idx].position >> 1);
         }
-        const medianError = median(activeErrors);
+
+        const nonFadeOutErrors: number[] = [];
+        for (const idx of cache.tickPool.nonFadeOutTicks) {
+            nonFadeOutErrors.push(cache.tickPool.pool[idx].position >> 1);
+        }
+        
+        const medianError = median(nonFadeOutErrors);
         updateArrow(medianError);
         if (settings.showSD) {
-            const standardDeviationError = standardDeviation(activeErrors);
+            const standardDeviationError = standardDeviation(nonFadeOutErrors);
             const sdElement = getElement(".sd");
             if (sdElement) {
                 sdElement.innerText = standardDeviationError.toFixed(2);
