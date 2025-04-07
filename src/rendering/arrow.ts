@@ -1,14 +1,30 @@
 import { getElement } from "../rendering/elements";
 import { settings } from "../sockets/settings";
 
-// Animation functions
+// Cache DOM element and settings
 const arrow = getElement(".arrow");
-const { perfectArrowThreshold, disableHardwareAcceleration } = settings;
+let cachedSettings = {
+    perfectArrowThreshold: settings.perfectArrowThreshold,
+    disableHardwareAcceleration: settings.disableHardwareAcceleration
+};
+
+export const loadArrowSettings = () => {
+    // Update cached settings
+    cachedSettings = {
+        perfectArrowThreshold: settings.perfectArrowThreshold,
+        disableHardwareAcceleration: settings.disableHardwareAcceleration
+    };
+    for (const [key, value] of Object.entries(cachedSettings)) {
+        console.log(`[ARROW_SETTINGS] ${key}: ${value}`);
+    }
+    return cachedSettings;
+};
+
+const { perfectArrowThreshold, disableHardwareAcceleration } = cachedSettings;
 
 const getArrowColor = (average: number): string => {
     const absError = Math.abs(average);
-    const threshold = perfectArrowThreshold;
-    if (absError <= threshold) {
+    if (absError <= perfectArrowThreshold) {
         return "var(--arrow-perfect)";
     }
     if (average < 0) {
