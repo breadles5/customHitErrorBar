@@ -59,7 +59,7 @@ jobs:
                 echo "Merging upstream/master into current branch (master)..."
                 # Merge upstream/master into the current branch (should be master).
                 # Fail the workflow if merge conflicts occur.
-                git merge upstream/master -m "Merge upstream/master into master"
+                git merge upstream/master --allow-unrelated-histories -m "Merge upstream/master into master"
                 # No push needed here; the commit step will push the merged changes + new build files to a new branch.
               shell: bash
 
