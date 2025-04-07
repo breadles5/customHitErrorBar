@@ -15,7 +15,13 @@ const getArrowColor = (average: number): string => {
     return "var(--arrow-late)";
 };
 
+let oldPosition = 0;
 export const updateArrow = (targetPosition: number): void => {
+    if (targetPosition === oldPosition) {
+        return;
+    }
+    oldPosition = targetPosition;
+    // console.log(`moved from ${oldPosition} to ${targetPosition}`);
     if (arrow) {
         // conditionally use hardware accelerated transform
         if (settings.disableHardwareAcceleration) {
@@ -28,6 +34,7 @@ export const updateArrow = (targetPosition: number): void => {
 };
 
 export function resetArrow() {
+    oldPosition = 0;
     if (arrow) {
         arrow.style.borderTopColor = "#fff";
         if (settings.disableHardwareAcceleration) {
