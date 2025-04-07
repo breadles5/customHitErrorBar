@@ -2,7 +2,7 @@
     "name": "custom-hit-error-bar",
     "author": "breadles",
     "license": "GPL-3.0-only",
-    "version": "3.1.0",
+    "version": "3.2.0",
     "type": "module",
     "scripts": {
         "build:prod": "vite build --mode production",

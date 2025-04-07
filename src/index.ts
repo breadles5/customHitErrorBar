@@ -1,4 +1,3 @@
-
 import WebSocketManager from "./sockets/socket";
 import type { CommandData, WEBSOCKET_V2, WEBSOCKET_V2_PRECISE } from "./sockets/types";
 import { settings, updateSettings, getSettings } from "./sockets/settings";
@@ -6,13 +5,11 @@ import {
     updateTimingWindowElements,
     setHidden,
     setVisible,
-    elementCache,
-    getAllElements,
     getElement,
 } from "./rendering/elements";
 import { calculateModTimingWindows } from "./calculation/timingWindows";
 import { renderTicksOnLoad, updateTicks } from "./rendering/ticks";
-import { updateArrow } from "./rendering/arrow";
+import { loadArrowSettings, updateArrow } from "./rendering/arrow";
 import { TickPool } from "./calculation/tickPool";
 import { reset } from "./rendering/reset";
 import { median, standardDeviation } from "./calculation/statistics";
@@ -54,19 +51,13 @@ wsManager.commands((data: CommandData) => {
 
         if (command === "getSettings") {
             updateSettings(message);
+            loadArrowSettings();
         }
     } catch (error) {
         // this is still needed for debugging
         console.error("[MESSAGE_ERROR] Error processing WebSocket message:", error);
     }
 });
-
-// Handle background color URL parameter
-const urlParams = new URLSearchParams(window.location.search);
-const bgColor = urlParams.get('bg');
-if (bgColor) {
-  document.body.style.backgroundColor = bgColor;
-}
 
 if (settings.showSD) {
     const container = getElement("#container");
@@ -122,7 +113,7 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
         }
     } else {
         cache.tickPool.update(hitErrors);
-        
+
         // should help reduce updateTicks calls during map breaks
         if (cache.tickPool.activeTicks.size > 0) {
             updateTicks();
@@ -132,10 +123,16 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
         for (const idx of cache.tickPool.activeTicks) {
             activeErrors.push(cache.tickPool.pool[idx].position >> 1);
         }
-        const medianError = median(activeErrors);
+
+        const nonFadeOutErrors: number[] = [];
+        for (const idx of cache.tickPool.nonFadeOutTicks) {
+            nonFadeOutErrors.push(cache.tickPool.pool[idx].position >> 1);
+        }
+
+        const medianError = median(nonFadeOutErrors);
         updateArrow(medianError);
         if (settings.showSD) {
-            const standardDeviationError = standardDeviation(activeErrors);
+            const standardDeviationError = standardDeviation(nonFadeOutErrors);
             const sdElement = getElement(".sd");
             if (sdElement) {
                 sdElement.innerText = standardDeviationError.toFixed(2);
