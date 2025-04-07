@@ -54,12 +54,12 @@ jobs:
                 echo "Adding upstream remote..."
                 # Add upstream if it doesn't exist
                 git remote add upstream https://github.com/tosuapp/counters.git || echo "Upstream remote already exists."
-                echo "Fetching upstream main branch..."
-                git fetch upstream main
-                echo "Merging upstream/main into current branch (master)..."
-                # Merge upstream/main into the current branch (should be master).
+                echo "Fetching upstream master branch..."
+                git fetch upstream master
+                echo "Merging upstream/master into current branch (master)..."
+                # Merge upstream/master into the current branch (should be master).
                 # Fail the workflow if merge conflicts occur.
-                git merge upstream/main -m "Merge upstream/main into master"
+                git merge upstream/master -m "Merge upstream/master into master"
                 # No push needed here; the commit step will push the merged changes + new build files to a new branch.
               shell: bash
 
