@@ -85,6 +85,7 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
                 cache.mods = data.play.mods.name;
             }
 
+            cache.tickPool.updateModMultiplier(cache.mods);
             cache.firstObjectTime = data.beatmap.time.firstObject;
             cache.timingWindows = calculateModTimingWindows(cache.mode, cache.od, cache.mods);
             updateTimingWindowElements();
@@ -104,7 +105,6 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
 const apiV2PreciseFilter = ["hitErrors", "currentTime"];
 wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
     const { hitErrors, currentTime } = data;
-
     if (currentTime < cache.firstObjectTime) {
         if (!cache.isReset) {
             reset();
