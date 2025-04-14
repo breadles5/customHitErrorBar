@@ -64,7 +64,7 @@ if (settings.showSD) {
         const sd = document.createElement("div");
         sd.classList.add("sd");
         sd.innerText = "0.00";
-        container.appendChild(sd);
+        container.prepend(sd);
     }
 }
 
@@ -88,7 +88,6 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
             cache.tickPool.updateModMultiplier(cache.mods);
             cache.firstObjectTime = data.beatmap.time.firstObject;
             cache.timingWindows = calculateTimingWindows(cache.mode, cache.od, cache.mods);
-            console.log("timing windows\n", cache.timingWindows);
             updateTimingWindowElements();
             setVisible();
             cache.isReset = false;
