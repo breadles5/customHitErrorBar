@@ -7,7 +7,7 @@ import {
     setVisible,
     getElement,
 } from "./rendering/elements";
-import { calculateModTimingWindows } from "./calculation/timingWindows";
+import { calculateTimingWindows } from "./calculation/timingWindows";
 import { renderTicksOnLoad, updateTicks } from "./rendering/ticks";
 import { updateArrow } from "./rendering/arrow";
 import { TickPool } from "./calculation/tickPool";
@@ -87,7 +87,8 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
 
             cache.tickPool.updateModMultiplier(cache.mods);
             cache.firstObjectTime = data.beatmap.time.firstObject;
-            cache.timingWindows = calculateModTimingWindows(cache.mode, cache.od, cache.mods);
+            cache.timingWindows = calculateTimingWindows(cache.mode, cache.od, cache.mods);
+            console.log("timing windows\n", cache.timingWindows);
             updateTimingWindowElements();
             setVisible();
             cache.isReset = false;
