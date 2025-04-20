@@ -129,11 +129,13 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
         const medianError = median(nonFadeOutErrors);
         updateArrow(medianError);
         if (settings.showSD) {
-            const standardDeviationError = standardDeviation(nonFadeOutErrors);
-            const sdElement = getElement(".sd");
-            if (sdElement) {
-                sdElement.innerText = standardDeviationError.toFixed(2);
-            }
+            requestAnimationFrame(() => {
+                const standardDeviationError = standardDeviation(nonFadeOutErrors);
+                const sdElement = getElement(".sd");
+                if (sdElement) {
+                    sdElement.innerText = standardDeviationError.toFixed(2);
+                }
+            });
         }
         if (cache.isReset) {
             cache.isReset = false;
