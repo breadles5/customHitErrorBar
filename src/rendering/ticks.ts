@@ -58,11 +58,6 @@ export const updateTicks = (): void => {
             const tick = cache.tickPool.pool[i];
             const tickElement = tickElementsArray[i]; // Direct access
 
-            // Update class name if needed
-            if (tick.classNames !== tickElement.className) {
-                tickElement.className = tick.classNames;
-            }
-
             // Update transform only if the position has actually changed
             const targetX = tick.position;
             const lastX = lastAppliedX[i];
@@ -77,6 +72,11 @@ export const updateTicks = (): void => {
                     tickElement.style.transform = newTransform;
                 }
                 lastAppliedX[i] = targetX; // Update the tracked value
+
+                // Update class name if needed
+                if (tick.classNames !== tickElement.className) {
+                    tickElement.className = tick.classNames;
+                }
             }
         }
     });
