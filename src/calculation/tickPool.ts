@@ -68,7 +68,6 @@ export class TickPool {
     readonly pool: TickImpl[]; // readonly doesnt prevent us from modifying the array, only from reassigning it
     readonly activeTicks: Set<number> = new Set(); // Store indices of active ticks'
     readonly nonFadeOutTicks: Set<number> = new Set(); // Store indices of visible ticks
-    private modMultiplier = 1;
     constructor() {
         // TODO: add a setting for pool size
         this.PoolSize = 100;
@@ -85,19 +84,11 @@ export class TickPool {
         this.processedHits = 0;
     }
 
-    updateModMultiplier(mods: string) {
-        if (mods.includes("HT")) {
-            this.modMultiplier = 1 / 0.75; // 4/3
-        } else if (/DT|NC/.test(mods)) {
-            this.modMultiplier = 1 / 1.5; // 2/3
-        } else {
-            this.modMultiplier = 1;
-        }
-    }
     update(hitErrors: number[]) {
         const now = Date.now();
         const { tickDuration, fadeOutDuration } = settings;
         const timeoutThreshold = tickDuration + fadeOutDuration;
+        const { rate } = cache;
 
         // cache class properties here
         const poolSize = this.PoolSize;
@@ -130,7 +121,7 @@ export class TickPool {
         if (processedHits === hitErrors.length) return;
         for (let i = processedHits; i < hitErrors.length; i++) {
             const poolIndex = i % poolSize;
-            const error = hitErrors[i] * this.modMultiplier;
+            const error = hitErrors[i] / rate;
             const tick = pool[poolIndex];
 
             // note: processedHits is a constant declaration referencing the value from the previous state

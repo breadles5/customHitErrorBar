@@ -20,6 +20,7 @@ interface cache {
     mode: string;
     mods: string;
     od: number;
+    rate: number;
     state: string;
     timingWindows: Map<PropertyKey, number>;
     tickPool: TickPool;
@@ -31,6 +32,7 @@ export const cache: cache = {
     mode: "",
     mods: "", // mod names concatenated as string
     od: 0,
+    rate: 0,
     state: "",
     timingWindows: new Map<string, number>(), // same can't be said here, since mania has 5 timing windows, while all taiko and standard have 3
     tickPool: new TickPool(),
@@ -85,7 +87,8 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
                 cache.mods = data.play.mods.name;
             }
 
-            cache.tickPool.updateModMultiplier(cache.mods);
+            
+            cache.rate = data.play.mods.rate;
             cache.firstObjectTime = data.beatmap.time.firstObject;
             cache.timingWindows = calculateTimingWindows(cache.mode, cache.od, cache.mods);
             updateTimingWindowElements();
