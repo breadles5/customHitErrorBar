@@ -17,30 +17,34 @@ const getArrowColor = (average: number): string => {
 
 let oldPosition = 0;
 export const updateArrow = (targetPosition: number): void => {
-    if (targetPosition === oldPosition) {
-        return;
-    }
-    oldPosition = targetPosition;
-    // console.log(`moved from ${oldPosition} to ${targetPosition}`);
-    if (arrow) {
-        // conditionally use hardware accelerated transform
-        if (settings.disableHardwareAcceleration) {
-            arrow.style.transform = `translateX(${targetPosition * 2}px)`;
+    requestAnimationFrame(() => {
+        if (targetPosition === oldPosition) {
             return;
         }
-        arrow.style.transform = `translate3d(${targetPosition * 2}px, 0px, 0px)`;
-        arrow.style.borderTopColor = getArrowColor(targetPosition);
-    }
+        oldPosition = targetPosition;
+        // console.log(`moved from ${oldPosition} to ${targetPosition}`);
+        if (arrow) {
+            // conditionally use hardware accelerated transform
+            if (settings.disableHardwareAcceleration) {
+                arrow.style.transform = `translateX(${targetPosition * 2}px)`;
+                return;
+            }
+            arrow.style.transform = `translate3d(${targetPosition * 2}px, 0px, 0px)`;
+            arrow.style.borderTopColor = getArrowColor(targetPosition);
+        }
+    });
 };
 
 export function resetArrow() {
-    oldPosition = 0;
-    if (arrow) {
-        arrow.style.borderTopColor = "#fff";
-        if (settings.disableHardwareAcceleration) {
-            arrow.style.transform = "translateX(0px)";
-            return;
+    requestAnimationFrame(() => {
+        oldPosition = 0;
+        if (arrow) {
+            arrow.style.borderTopColor = "#fff";
+            if (settings.disableHardwareAcceleration) {
+                arrow.style.transform = "translateX(0px)";
+                return;
+            }
+            arrow.style.transform = "translate3d(0px, 0px, 0px)";
         }
-        arrow.style.transform = "translate3d(0px, 0px, 0px)";
-    }
+    });
 }
