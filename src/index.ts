@@ -8,9 +8,9 @@ import {
     getElement,
 } from "./rendering/elements";
 import { calculateTimingWindows } from "./calculation/timingWindows";
-import { renderTicksOnLoad, updateTicks } from "./rendering/ticks";
+import { renderTicksOnLoad } from "./rendering/ticks"; // Removed updateTicks
 import { updateArrow } from "./rendering/arrow";
-import { TickPool } from "./calculation/tickPool";
+import { TickManager } from "./calculation/tickManager";
 import { reset } from "./rendering/reset";
 import { median, standardDeviation } from "./calculation/statistics";
 
@@ -23,7 +23,7 @@ interface cache {
     rate: number;
     state: string;
     timingWindows: Map<PropertyKey, number>;
-    tickPool: TickPool;
+    tickPool: TickManager;
     firstObjectTime: number;
     isReset: boolean; // for state check
 }
@@ -35,7 +35,7 @@ export const cache: cache = {
     rate: 0,
     state: "",
     timingWindows: new Map<string, number>(), // same can't be said here, since mania has 5 timing windows, while all taiko and standard have 3
-    tickPool: new TickPool(),
+    tickPool: new TickManager(),
     firstObjectTime: 0,
     isReset: true,
 };
@@ -115,11 +115,6 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
         }
     } else {
         cache.tickPool.update(hitErrors);
-
-        // should help reduce updateTicks calls during map breaks
-        if (cache.tickPool.activeTicks.size > 0) {
-            updateTicks();
-        }
 
         const nonFadeOutErrors: number[] = [];
         for (const idx of cache.tickPool.nonFadeOutTicks) {
