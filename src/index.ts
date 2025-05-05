@@ -71,7 +71,7 @@ if (settings.showSD) {
 }
 
 // Handle game state and menu updates
-const apiV2Filters = ["state", "play", "beatmap"];
+const apiV2Filters = ["state", { field: "play", keys: ['mode', 'mods'] }, { field: "beatmap", keys: ['mode', 'stats', 'time'] }];
 wsManager.api_v2((data: WEBSOCKET_V2) => {
     if (cache.state !== data.state.name) {
         cache.state = data.state.name;
