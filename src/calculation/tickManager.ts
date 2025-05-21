@@ -46,9 +46,22 @@ export class TickImpl implements Tick {
     }
 
     resetActive(hitError: number) {
+        // Force a reflow by toggling display none/block
+        if (this.element) {
+            // Store current display value to restore it later
+            const originalDisplay = this.element.style.display;
+            this.element.style.display = 'none';
+            // Force reflow
+            void this.element.offsetHeight;
+            this.element.style.display = originalDisplay || '';
+            
+            // Force a reflow to ensure the animation restarts
+            void this.element.offsetHeight;
+        }
+        
         this.position = hitError << 1;
         this.timestamp = Date.now();
-        this.setClassNames(); // Updates classNames and calls updateElement
+        this.setClassNames();
     }
 
     private setClassNames() {
@@ -196,8 +209,13 @@ export class TickManager {
             } else {
                 const processedHitsindex = processedHits - 1;
                 if (i > processedHitsindex) {
-                    // Call instance method now
-                    tick.resetActive(error);
+                    // If we're reusing an active tick, reset it first
+                    if (activeTicks.has(poolIndex)) {
+                        tick.setInactive();
+                        tick.setActive(error);
+                    } else {
+                        tick.resetActive(error);
+                    }
                     // Ensure it's in nonFadeOutTicks if it was reset
                     nonFadeOutTicks.add(poolIndex);
                     this.processedHits++;
