@@ -9,6 +9,7 @@ export class TickImpl implements Tick {
     timestamp: number; // timestamp in milliseconds
     element: HTMLElement | null; // Added element property
     private lastAppliedX: number; // Track last applied X for optimization
+    private _currentAnimation: Animation | null = null;
 
     constructor() {
         this.position = 0;
@@ -21,47 +22,79 @@ export class TickImpl implements Tick {
 
     // Instance methods
     reset() {
+        this._currentAnimation?.cancel();
+        if (this.element) {
+            this.element.style.opacity = '0'; // Ensure inactive is fully transparent
+        }
         this.position = 0;
         this.classNames = "tick inactive";
         this.active = false;
-        this.timestamp = Date.now(); // Keep timestamp for potential immediate reuse? Or set to 0? Let's keep it for now.
+        this.timestamp = Date.now(); 
         this.updateElement();
     }
 
     setActive(hitError: number) {
+        this._currentAnimation?.cancel();
+        if (this.element) {
+            this.element.style.opacity = String(settings.tickOpacity);
+            this.element.style.visibility = 'visible'; // Ensure it's visible before animating
+            this._currentAnimation = this.element.animate(
+                [
+                    { opacity: settings.tickOpacity }, 
+                    { opacity: 0 }
+                ],
+                {
+                    duration: settings.fadeOutDuration,
+                    delay: settings.tickDuration,
+                    easing: 'linear',
+                    fill: 'forwards'
+                }
+            );
+        }
+
         this.position = hitError << 1;
         this.active = true;
         this.timestamp = Date.now();
-        this.setClassNames(); // Updates classNames and calls updateElement
+        this.setClassNames(); // Updates classNames (colors, base class) and calls updateElement
     }
 
     setInactive() {
         // Only update if it's actually active to avoid unnecessary DOM changes
         if (this.active) {
+            this._currentAnimation?.cancel();
+            if (this.element) {
+                this.element.style.opacity = '0';
+                this.element.style.visibility = 'hidden'; // Consistent with .tick.inactive CSS
+            }
             this.active = false;
             this.classNames = "tick inactive";
             this.timestamp = 0; // Set timestamp to 0 for inactive
-            this.updateElement();
+            this.updateElement(); // Applies .inactive class
         }
     }
 
     resetActive(hitError: number) {
-        // Force a reflow by toggling display none/block
+        this._currentAnimation?.cancel();
         if (this.element) {
-            // Store current display value to restore it later
-            const originalDisplay = this.element.style.display;
-            this.element.style.display = 'none';
-            // Force reflow
-            void this.element.offsetHeight;
-            this.element.style.display = originalDisplay || '';
-            
-            // Force a reflow to ensure the animation restarts
-            void this.element.offsetHeight;
+            this.element.style.opacity = String(settings.tickOpacity);
+            this.element.style.visibility = 'visible'; // Ensure it's visible before animating
+            this._currentAnimation = this.element.animate(
+                [
+                    { opacity: settings.tickOpacity }, 
+                    { opacity: 0 }
+                ],
+                {
+                    duration: settings.fadeOutDuration,
+                    delay: settings.tickDuration,
+                    easing: 'linear',
+                    fill: 'forwards'
+                }
+            );
         }
-        
+
         this.position = hitError << 1;
         this.timestamp = Date.now();
-        this.setClassNames();
+        this.setClassNames(); // Updates classNames (colors, base class) and calls updateElement
     }
 
     private setClassNames() {
