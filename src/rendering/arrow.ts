@@ -24,13 +24,13 @@ export const updateArrow = (targetPosition: number): void => {
         oldPosition = targetPosition;
         // console.log(`moved from ${oldPosition} to ${targetPosition}`);
         if (arrow) {
+            arrow.style.borderTopColor = getArrowColor(targetPosition);
             // conditionally use hardware accelerated transform
             if (settings.disableHardwareAcceleration) {
                 arrow.style.transform = `translateX(${targetPosition * 2}px)`;
                 return;
             }
             arrow.style.transform = `translate3d(${targetPosition * 2}px, 0px, 0px)`;
-            arrow.style.borderTopColor = getArrowColor(targetPosition);
         }
     });
 };
