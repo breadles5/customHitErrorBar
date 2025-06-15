@@ -198,5 +198,21 @@
         "description": "only check this if you are using the overlay in the ingame overlay injector",
         "options": [],
         "value": false
+    },
+    {
+        "uniqueID": "useCustomTimingWindows",
+        "type": "checkbox",
+        "title": "Use Custom Timing Windows",
+        "description": "enable to override automatic timing window calculation",
+        "options": [],
+        "value": false
+    },
+    {
+        "uniqueID": "customTimingWindows",
+        "type": "text",
+        "title": "Custom Timing Windows",
+        "description": "comma separated list of 5 timing windows",
+        "options": [],
+        "value": "16.5,64,97,127,151"
     }
 ]
