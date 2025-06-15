@@ -9,7 +9,7 @@ export const settings: Settings = {
     TimingWindowOpacity: 0,
     barHeight: 0,
     barWidth: 0,
-    colorBar: "#000000",
+    colorBar: "transparent",
     tickWidth: 0,
     tickHeight: 0,
     tickDuration: 0,
@@ -17,17 +17,17 @@ export const settings: Settings = {
     fadeOutDuration: 0,
     arrowSize: 0,
     perfectArrowThreshold: 0,
-    colorArrowEarly: "#000000",
-    colorArrowLate: "#000000",
-    colorArrowPerfect: "#000000",
+    colorArrowEarly: "transparent",
+    colorArrowLate: "transparent",
+    colorArrowPerfect: "transparent",
     timingWindowHeight: 0,
     isRounded: 0,
-    color300g: "#000000",
-    color300: "#000000",
-    color200: "#000000",
-    color100: "#000000",
-    color50: "#000000",
-    color0: "#000000",
+    color300g: "transparent",
+    color300: "transparent",
+    color200: "transparent",
+    color100: "transparent",
+    color50: "transparent",
+    color0: "transparent",
     showSD: false,
     disableHardwareAcceleration: false,
     useCustomTimingWindows: false,
@@ -131,18 +131,19 @@ const updateCSSLayout = () => {
 };
 
 const updateCSSColors = () => {
+    const sanitize = (color: string) => (color.toLowerCase() === "#000000" ? "transparent" : color);
     root.style.setProperty("--timing-windows-opacity", String(settings.TimingWindowOpacity));
     root.style.setProperty("--tick-opacity", String(settings.tickOpacity));
-    root.style.setProperty("--color-300g", settings.color300g);
-    root.style.setProperty("--color-300", settings.color300);
-    root.style.setProperty("--color-200", settings.color200);
-    root.style.setProperty("--color-100", settings.color100);
-    root.style.setProperty("--color-50", settings.color50);
-    root.style.setProperty("--color-0", settings.color0);
-    root.style.setProperty("--arrow-early", settings.colorArrowEarly);
-    root.style.setProperty("--arrow-late", settings.colorArrowLate);
-    root.style.setProperty("--arrow-perfect", settings.colorArrowPerfect);
-    root.style.setProperty("--bar-color", settings.colorBar);
+    root.style.setProperty("--color-300g", sanitize(settings.color300g));
+    root.style.setProperty("--color-300", sanitize(settings.color300));
+    root.style.setProperty("--color-200", sanitize(settings.color200));
+    root.style.setProperty("--color-100", sanitize(settings.color100));
+    root.style.setProperty("--color-50", sanitize(settings.color50));
+    root.style.setProperty("--color-0", sanitize(settings.color0));
+    root.style.setProperty("--arrow-early", sanitize(settings.colorArrowEarly));
+    root.style.setProperty("--arrow-late", sanitize(settings.colorArrowLate));
+    root.style.setProperty("--arrow-perfect", sanitize(settings.colorArrowPerfect));
+    root.style.setProperty("--bar-color", sanitize(settings.colorBar));
 };
 
 export const updateVisibility = () => {
