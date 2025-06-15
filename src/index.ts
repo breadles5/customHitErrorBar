@@ -1,12 +1,7 @@
 import WebSocketManager from "./sockets/socket";
 import type { CommandData, WEBSOCKET_V2, WEBSOCKET_V2_PRECISE } from "./sockets/types";
 import { settings, updateSettings, getSettings } from "./sockets/settings";
-import {
-    updateTimingWindowElements,
-    setHidden,
-    setVisible,
-    getElement,
-} from "./rendering/elements";
+import { updateTimingWindowElements, setHidden, setVisible, getElement } from "./rendering/elements";
 import { calculateTimingWindows } from "./calculation/timingWindows";
 import { renderTicksOnLoad } from "./rendering/ticks"; // Removed updateTicks
 import { updateArrow } from "./rendering/arrow";
@@ -71,7 +66,11 @@ if (settings.showSD) {
 }
 
 // Handle game state and menu updates
-const apiV2Filters = ["state", { field: "play", keys: ['mode', 'mods'] }, { field: "beatmap", keys: ['mode', 'stats', 'time'] }];
+const apiV2Filters = [
+    "state",
+    { field: "play", keys: ["mode", "mods"] },
+    { field: "beatmap", keys: ["mode", "stats", "time"] },
+];
 wsManager.api_v2((data: WEBSOCKET_V2) => {
     if (cache.state !== data.state.name) {
         cache.state = data.state.name;
@@ -87,10 +86,10 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
                 cache.mods = data.play.mods.name;
             }
 
-            
             cache.rate = data.play.mods.rate;
             cache.firstObjectTime = data.beatmap.time.firstObject;
-            cache.timingWindows = calculateTimingWindows(cache.mode, cache.od, cache.mods);
+            const custom = settings.useCustomTimingWindows ? settings.customTimingWindows : undefined;
+            cache.timingWindows = calculateTimingWindows(cache.mode, cache.od, cache.mods, custom);
             updateTimingWindowElements();
             setVisible();
             cache.isReset = false;
