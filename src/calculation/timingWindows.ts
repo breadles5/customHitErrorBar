@@ -6,7 +6,7 @@ const calculateOsuWindows = (od: number, mods: string): Map<string, number> => {
         windows.set("100", 140 - 8 * modifiedOd);
         windows.set("50", 200 - 10 * modifiedOd);
     } else if (mods.includes("HR")) {
-        const modifiedOd = Math.min(od * 1.4, 10)
+        const modifiedOd = Math.min(od * 1.4, 10);
         windows.set("300", 50 - 3 * modifiedOd);
         windows.set("100", 140 - 8 * modifiedOd);
         windows.set("50", 200 - 10 * modifiedOd);
@@ -29,7 +29,7 @@ const calculateTaikoWindows = (od: number, mods: string): Map<string, number> =>
         } else {
             windows.set("100", 110 - 6 * modifiedOd);
             windows.set("50", 120 - 5 * modifiedOd);
-        };
+        }
     } else if (mods.includes("HR")) {
         const modifiedOd = Math.min(od * 1.4, 10);
         windows.set("300", 50 - 3 * modifiedOd);
@@ -39,7 +39,7 @@ const calculateTaikoWindows = (od: number, mods: string): Map<string, number> =>
         } else {
             windows.set("100", 110 - 6 * modifiedOd);
             windows.set("50", 120 - 5 * modifiedOd);
-        };
+        }
     } else {
         windows.set("300", 50 - 3 * od);
         if (od >= 5) {
@@ -48,7 +48,7 @@ const calculateTaikoWindows = (od: number, mods: string): Map<string, number> =>
         } else {
             windows.set("100", 110 - 6 * od);
             windows.set("50", 120 - 5 * od);
-        };
+        }
     }
     return windows;
 };
@@ -74,14 +74,39 @@ const calculateManiaWindows = (od: number, mods: string): Map<string, number> =>
         windows.set("300", 64 - 3 * od);
         windows.set("200", 97 - 3 * od);
         windows.set("100", 127 - 3 * od);
-        windows.set("50", 151 - 3 * od);        
+        windows.set("50", 151 - 3 * od);
     }
     return windows;
 };
 
-export const calculateTimingWindows = (gamemode: string, od: number, mods: string): Map<string, number> => {
+export const calculateTimingWindows = (
+    gamemode: string,
+    od: number,
+    mods: string,
+    customTimingWindows?: string,
+): Map<string, number> => {
+    if (customTimingWindows) {
+        const values = customTimingWindows.split(",").map((v) => Number.parseFloat(v.trim()));
+        const windows = new Map<string, number>();
+        if (gamemode === "mania") {
+            const grades = ["300g", "300", "200", "100", "50"];
+            grades.forEach((grade, idx) => {
+                if (idx < values.length) {
+                    windows.set(grade, values[idx]);
+                }
+            });
+        } else {
+            const grades = ["300", "100", "50"];
+            grades.forEach((grade, idx) => {
+                if (idx < values.length) {
+                    windows.set(grade, values[idx]);
+                }
+            });
+        }
+        return windows;
+    }
+
     // Calculate timing windows based on gamemode
-    // pass in od and mods, and get back a map of timing windows
     switch (gamemode) {
         case "osu":
             return calculateOsuWindows(od, mods);

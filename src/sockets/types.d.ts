@@ -73,6 +73,8 @@ export interface Settings {
     color0: string;
     showSD: boolean;
     disableHardwareAcceleration: boolean;
+    useCustomTimingWindows: boolean;
+    customTimingWindows: string;
 }
 
 export interface CommandData {

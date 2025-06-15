@@ -30,6 +30,8 @@ export const settings: Settings = {
     color0: "#000000",
     showSD: false,
     disableHardwareAcceleration: false,
+    useCustomTimingWindows: false,
+    customTimingWindows: "16.5,64,97,127,151",
 };
 // define root element
 const root = typeof document !== "undefined" ? document.documentElement : { style: { setProperty: () => {} } };
