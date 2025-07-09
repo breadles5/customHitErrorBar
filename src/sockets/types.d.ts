@@ -72,7 +72,6 @@ export interface Settings {
     color50: string;
     color0: string;
     showSD: boolean;
-    disableHardwareAcceleration: boolean;
     useCustomTimingWindows: boolean;
     customTimingWindows: string;
 }
