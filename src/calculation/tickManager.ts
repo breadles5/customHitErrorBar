@@ -138,9 +138,7 @@ export class TickImpl implements Tick {
         // Update transform only if the position has actually changed
         const targetX = this.active ? this.position : 0; // Inactive ticks should be at position 0
         if (targetX !== this.lastAppliedX) {
-            const newTransform = settings.disableHardwareAcceleration
-                ? `translateX(${targetX}px)`
-                : `translate3d(${targetX}px, 0px, 0px)`;
+            const newTransform = `translate3d(${targetX}px, 0px, 0px)`;
 
             // Check current style to potentially avoid setting the same value (minor optimization)
             if (this.element.style.transform !== newTransform) {

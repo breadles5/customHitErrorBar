@@ -4,24 +4,24 @@ import { getElement } from "../rendering/elements";
     lets agree to never touch this file again
     it's a mess
 */
-// Initialize empty settings object with defaults to avoid undefined checks
+
 export const settings: Settings = {
     TimingWindowOpacity: 0,
-    barHeight: 0,
-    barWidth: 0,
-    colorBar: "transparent",
-    tickWidth: 0,
-    tickHeight: 0,
-    tickDuration: 0,
-    tickOpacity: 0,
-    fadeOutDuration: 0,
-    arrowSize: 0,
-    perfectArrowThreshold: 0,
-    colorArrowEarly: "transparent",
-    colorArrowLate: "transparent",
-    colorArrowPerfect: "transparent",
-    timingWindowHeight: 0,
-    isRounded: 0,
+    barHeight: 60,
+    barWidth: 8,
+    colorBar: "#bf0000",
+    tickWidth: 8,
+    tickHeight: 40,
+    tickDuration: 500,
+    tickOpacity: 0.75,
+    fadeOutDuration: 800,
+    arrowSize: 25,
+    perfectArrowThreshold: 5,
+    colorArrowEarly: "#0080ff",
+    colorArrowLate: "#ff0000",
+    colorArrowPerfect: "#ffffff",
+    timingWindowHeight: 40,
+    isRounded: 100,
     color300g: "transparent",
     color300: "transparent",
     color200: "transparent",
@@ -29,7 +29,6 @@ export const settings: Settings = {
     color50: "transparent",
     color0: "transparent",
     showSD: false,
-    disableHardwareAcceleration: false,
     useCustomTimingWindows: false,
     customTimingWindows: "16.5,64,97,127,151",
 };
@@ -63,11 +62,6 @@ export const updateSettings = (message: Partial<Settings>) => {
             } else if (key !== "showSD") {
                 hasLayoutChanges = true;
             }
-
-            // Specifically check for hardware acceleration change
-            if (typedKey === "disableHardwareAcceleration") {
-                updateHardwareAcceleration(); // Update immediately
-            }
         }
     }
 
@@ -85,80 +79,62 @@ export const updateSettings = (message: Partial<Settings>) => {
     }
 };
 
-// Function to specifically update hardware acceleration CSS variables
-const updateHardwareAcceleration = () => {
-    if (settings.disableHardwareAcceleration) {
-        root.style.setProperty("--transform-prop", "none");
-        root.style.setProperty("--will-change-prop", "auto"); // Use 'auto' or 'opacity' if only opacity changes
-    } else {
-        root.style.setProperty("--transform-prop", "translate3d(0,0,0)");
-        root.style.setProperty("--will-change-prop", "transform, opacity");
-    }
-};
-
 // Split CSS updates into layout and colors
 const updateCSSLayout = () => {
-    // Update size-related variables
-    root.style.setProperty("--fade-out-duration", `${settings.fadeOutDuration}ms`);
-    root.style.setProperty("--tick-duration", `${settings.tickDuration}ms`);
-    root.style.setProperty("--bar-height", `${settings.barHeight}px`);
-    root.style.setProperty("--bar-width", `${settings.barWidth}px`);
-    root.style.setProperty("--tick-width", `${settings.tickWidth}px`);
-    root.style.setProperty("--tick-height", `${settings.tickHeight}px`);
-    root.style.setProperty("--arrow-size", `${settings.arrowSize}px`);
-
-    // Calculate timing window height only if changed
-    const windowHeight = settings.barHeight * (settings.timingWindowHeight / 100);
-    if (windowHeight !== lastWindowHeight) {
+    const { barWidth, barHeight, tickWidth, tickHeight, timingWindowHeight, isRounded } = settings;
+    
+    // Calculate and set CSS variables
+    const windowHeight = window.innerHeight;
+    const timingWindowHeightPx = (barHeight * timingWindowHeight) / 100;
+    
+    // Only update if the window height has changed significantly (to prevent layout thrashing)
+    if (Math.abs(windowHeight - lastWindowHeight) > 1) {
+        root.style.setProperty("--window-height", `${windowHeight}px`);
         lastWindowHeight = windowHeight;
-        const clampedHeight = Math.max(0, Math.min(100, settings.timingWindowHeight));
-        root.style.setProperty("--timing-window-height", `${clampedHeight}`);
     }
-
-    // Calculate rounded corners only if changed
-    const roundedPercent = Math.max(0, Math.min(100, settings.isRounded)) / 100;
+    
+    // Only update if the rounded percentage has changed
+    const roundedPercent = Math.min(100, Math.max(0, isRounded));
     if (roundedPercent !== lastRoundedPercent) {
+        root.style.setProperty("--border-radius", `${roundedPercent}%`);
         lastRoundedPercent = roundedPercent;
-
-        const windowRadius = (windowHeight / 2) * roundedPercent;
-        const barRadius = (settings.barWidth / 2) * roundedPercent;
-        const tickRadius = (settings.tickWidth / 2) * roundedPercent;
-
-        root.style.setProperty("--timing-window-radius", `${windowRadius}px`);
-        root.style.setProperty("--bar-radius", `${barRadius}px`);
-        root.style.setProperty("--tick-radius", `${tickRadius}px`);
     }
+    
+    // Set other layout properties
+    root.style.setProperty("--bar-width", `${barWidth}px`);
+    root.style.setProperty("--bar-height", `${barHeight}px`);
+    root.style.setProperty("--tick-width", `${tickWidth}px`);
+    root.style.setProperty("--tick-height", `${tickHeight}px`);
+    root.style.setProperty("--timing-window-height", `${timingWindowHeightPx}px`);
 };
 
 const updateCSSColors = () => {
-    const sanitize = (color: string) => (color.toLowerCase() === "#000000" ? "transparent" : color);
-    root.style.setProperty("--timing-windows-opacity", String(settings.TimingWindowOpacity));
-    root.style.setProperty("--tick-opacity", String(settings.tickOpacity));
-    root.style.setProperty("--color-300g", sanitize(settings.color300g));
-    root.style.setProperty("--color-300", sanitize(settings.color300));
-    root.style.setProperty("--color-200", sanitize(settings.color200));
-    root.style.setProperty("--color-100", sanitize(settings.color100));
-    root.style.setProperty("--color-50", sanitize(settings.color50));
-    root.style.setProperty("--color-0", sanitize(settings.color0));
-    root.style.setProperty("--arrow-early", sanitize(settings.colorArrowEarly));
-    root.style.setProperty("--arrow-late", sanitize(settings.colorArrowLate));
-    root.style.setProperty("--arrow-perfect", sanitize(settings.colorArrowPerfect));
-    root.style.setProperty("--bar-color", sanitize(settings.colorBar));
+    const { colorBar, color300g, color300, color200, color100, color50, color0, colorArrowEarly, colorArrowLate, colorArrowPerfect, TimingWindowOpacity } = settings;
+    
+    // Set color variables
+    root.style.setProperty("--color-bar", colorBar);
+    root.style.setProperty("--color-300g", color300g);
+    root.style.setProperty("--color-300", color300);
+    root.style.setProperty("--color-200", color200);
+    root.style.setProperty("--color-100", color100);
+    root.style.setProperty("--color-50", color50);
+    root.style.setProperty("--color-0", color0);
+    root.style.setProperty("--color-arrow-early", colorArrowEarly);
+    root.style.setProperty("--color-arrow-late", colorArrowLate);
+    root.style.setProperty("--color-arrow-perfect", colorArrowPerfect);
+    root.style.setProperty("--timing-window-opacity", TimingWindowOpacity.toString());
 };
 
-export const updateVisibility = () => {
-    const sd = getElement(".sd");
-    if (sd) {
-        sd.style.display = settings.showSD ? "block" : "none";
+const updateVisibility = () => {
+    const sdElement = getElement(".sd");
+    if (sdElement) {
+        sdElement.style.display = settings.showSD ? "block" : "none";
     }
 };
 
 // Update CSS variables
 export const updateCSSVariables = () => {
-    // Update layout variables
     updateCSSLayout();
-    // Update color variables
     updateCSSColors();
-    // Update hardware acceleration settings
-    updateHardwareAcceleration();
+    updateVisibility();
 };

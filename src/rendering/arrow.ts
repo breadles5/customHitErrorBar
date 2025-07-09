@@ -25,11 +25,6 @@ export const updateArrow = (targetPosition: number): void => {
         // console.log(`moved from ${oldPosition} to ${targetPosition}`);
         if (arrow) {
             arrow.style.borderTopColor = getArrowColor(targetPosition);
-            // conditionally use hardware accelerated transform
-            if (settings.disableHardwareAcceleration) {
-                arrow.style.transform = `translateX(${targetPosition * 2}px)`;
-                return;
-            }
             arrow.style.transform = `translate3d(${targetPosition * 2}px, 0px, 0px)`;
         }
     });
@@ -40,10 +35,6 @@ export function resetArrow() {
         oldPosition = 0;
         if (arrow) {
             arrow.style.borderTopColor = "#fff";
-            if (settings.disableHardwareAcceleration) {
-                arrow.style.transform = "translateX(0px)";
-                return;
-            }
             arrow.style.transform = "translate3d(0px, 0px, 0px)";
         }
     });
