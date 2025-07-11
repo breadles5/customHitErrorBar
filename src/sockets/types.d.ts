@@ -1,3 +1,5 @@
+import type { Settings } from "./settings";
+
 export interface CALCULATE_PP {
     path: string;
     mode: number;
@@ -48,33 +50,7 @@ export interface CALCULATE_PP_RESPONSE {
     effectiveMissCount: number;
 }
 
-export interface Settings {
-    TimingWindowOpacity: number;
-    barHeight: number;
-    barWidth: number;
-    colorBar: string;
-    tickWidth: number;
-    tickHeight: number;
-    tickDuration: number;
-    tickOpacity: number;
-    fadeOutDuration: number;
-    arrowSize: number;
-    perfectArrowThreshold: number;
-    colorArrowEarly: string;
-    colorArrowLate: string;
-    colorArrowPerfect: string;
-    timingWindowHeight: number;
-    isRounded: number;
-    color300g: string;
-    color300: string;
-    color200: string;
-    color100: string;
-    color50: string;
-    color0: string;
-    showSD: boolean;
-    useCustomTimingWindows: boolean;
-    customTimingWindows: string;
-}
+
 
 export interface CommandData {
     command: string;
