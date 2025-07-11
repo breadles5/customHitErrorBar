@@ -24,12 +24,12 @@ export class TickImpl implements Tick {
     reset() {
         this._currentAnimation?.cancel();
         if (this.element) {
-            this.element.style.opacity = '0'; // Ensure inactive is fully transparent
+            this.element.style.opacity = "0"; // Ensure inactive is fully transparent
         }
         this.position = 0;
         this.classNames = "tick inactive";
         this.active = false;
-        this.timestamp = Date.now(); 
+        this.timestamp = Date.now();
         this.updateElement();
     }
 
@@ -37,19 +37,13 @@ export class TickImpl implements Tick {
         this._currentAnimation?.cancel();
         if (this.element) {
             this.element.style.opacity = String(settings.tickOpacity);
-            this.element.style.visibility = 'visible'; // Ensure it's visible before animating
-            this._currentAnimation = this.element.animate(
-                [
-                    { opacity: settings.tickOpacity }, 
-                    { opacity: 0 }
-                ],
-                {
-                    duration: settings.fadeOutDuration,
-                    delay: settings.tickDuration,
-                    easing: 'linear',
-                    fill: 'forwards'
-                }
-            );
+            this.element.style.visibility = "visible"; // Ensure it's visible before animating
+            this._currentAnimation = this.element.animate([{ opacity: settings.tickOpacity }, { opacity: 0 }], {
+                duration: settings.fadeOutDuration,
+                delay: settings.tickDuration,
+                easing: "linear",
+                fill: "forwards",
+            });
         }
 
         this.position = hitError << 1;
@@ -63,8 +57,8 @@ export class TickImpl implements Tick {
         if (this.active) {
             this._currentAnimation?.cancel();
             if (this.element) {
-                this.element.style.opacity = '0';
-                this.element.style.visibility = 'hidden'; // Consistent with .tick.inactive CSS
+                this.element.style.opacity = "0";
+                this.element.style.visibility = "hidden"; // Consistent with .tick.inactive CSS
             }
             this.active = false;
             this.classNames = "tick inactive";
@@ -77,19 +71,13 @@ export class TickImpl implements Tick {
         this._currentAnimation?.cancel();
         if (this.element) {
             this.element.style.opacity = String(settings.tickOpacity);
-            this.element.style.visibility = 'visible'; // Ensure it's visible before animating
-            this._currentAnimation = this.element.animate(
-                [
-                    { opacity: settings.tickOpacity }, 
-                    { opacity: 0 }
-                ],
-                {
-                    duration: settings.fadeOutDuration,
-                    delay: settings.tickDuration,
-                    easing: 'linear',
-                    fill: 'forwards'
-                }
-            );
+            this.element.style.visibility = "visible"; // Ensure it's visible before animating
+            this._currentAnimation = this.element.animate([{ opacity: settings.tickOpacity }, { opacity: 0 }], {
+                duration: settings.fadeOutDuration,
+                delay: settings.tickDuration,
+                easing: "linear",
+                fill: "forwards",
+            });
         }
 
         this.position = hitError << 1;
@@ -165,7 +153,9 @@ export class TickManager {
     // New method to assign elements
     setElements(elements: HTMLElement[]) {
         if (elements.length !== this.poolSize) {
-            console.error(`TickPool Error: Element count (${elements.length}) does not match PoolSize (${this.poolSize}).`);
+            console.error(
+                `TickPool Error: Element count (${elements.length}) does not match PoolSize (${this.poolSize}).`,
+            );
             return;
         }
         for (let i = 0; i < this.poolSize; i++) {
@@ -174,7 +164,6 @@ export class TickManager {
         }
         console.log("Tick elements assigned to TickPool.");
     }
-
 
     set() {
         for (const tick of this.pool) {
