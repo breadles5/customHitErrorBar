@@ -110,24 +110,24 @@ export const updateSettings = (message: Partial<Settings>) => {
 // Split CSS updates into layout and colors
 const updateCSSLayout = () => {
     const { barWidth, barHeight, tickWidth, tickHeight, timingWindowHeight, isRounded } = settings;
-    
+
     // Calculate and set CSS variables
     const windowHeight = window.innerHeight;
     const timingWindowHeightPx = (barHeight * timingWindowHeight) / 100;
-    
+
     // Only update if the window height has changed significantly (to prevent layout thrashing)
     if (Math.abs(windowHeight - lastWindowHeight) > 1) {
         root.style.setProperty("--window-height", `${windowHeight}px`);
         lastWindowHeight = windowHeight;
     }
-    
+
     // Only update if the rounded percentage has changed
     const roundedPercent = Math.min(100, Math.max(0, isRounded));
     if (roundedPercent !== lastRoundedPercent) {
         root.style.setProperty("--border-radius", `${roundedPercent}%`);
         lastRoundedPercent = roundedPercent;
     }
-    
+
     // Set other layout properties
     root.style.setProperty("--bar-width", `${barWidth}px`);
     root.style.setProperty("--bar-height", `${barHeight}px`);
@@ -137,8 +137,20 @@ const updateCSSLayout = () => {
 };
 
 const updateCSSColors = () => {
-    const { colorBar, color300g, color300, color200, color100, color50, color0, colorArrowEarly, colorArrowLate, colorArrowPerfect, TimingWindowOpacity } = settings;
-    
+    const {
+        colorBar,
+        color300g,
+        color300,
+        color200,
+        color100,
+        color50,
+        color0,
+        colorArrowEarly,
+        colorArrowLate,
+        colorArrowPerfect,
+        TimingWindowOpacity,
+    } = settings;
+
     // Set color variables
     root.style.setProperty("--color-bar", colorBar);
     root.style.setProperty("--color-300g", color300g);

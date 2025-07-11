@@ -50,8 +50,6 @@ export interface CALCULATE_PP_RESPONSE {
     effectiveMissCount: number;
 }
 
-
-
 export interface CommandData {
     command: string;
     message: Settings;
