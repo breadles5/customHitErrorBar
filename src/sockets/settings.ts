@@ -66,23 +66,29 @@ const root = typeof document !== "undefined" ? document.documentElement : { styl
 // Cache calculated values
 let lastWindowHeight = 0;
 let lastRoundedPercent = 0;
+const SETTINGS_LOG_PREFIX = "[SETTINGS]";
 
 export const getSettings = () => {
+    console.log(`${SETTINGS_LOG_PREFIX} Returning current settings snapshot`, settings);
     return settings;
 };
 
 // Update settings with new values
 export const updateSettings = (message: Partial<Settings>) => {
+    console.log(`${SETTINGS_LOG_PREFIX} Applying settings update`, message);
+
     const oldSettings = { ...settings };
 
     // Update changed settings only
     let hasVisualChanges = false;
     let hasLayoutChanges = false;
+    const changedKeys: string[] = [];
 
     for (const [key, value] of Object.entries(message)) {
         const typedKey = key as keyof Settings;
         if (Object.prototype.hasOwnProperty.call(settings, typedKey) && settings[typedKey] !== value) {
             settings[<keyof Settings>key] = <never>value;
+            changedKeys.push(key);
 
             // Track what kind of changes occurred
             if (key.startsWith("color") || key === "TimingWindowOpacity") {
@@ -93,16 +99,25 @@ export const updateSettings = (message: Partial<Settings>) => {
         }
     }
 
+    if (changedKeys.length === 0) {
+        console.log(`${SETTINGS_LOG_PREFIX} No changes detected in incoming update.`);
+    } else {
+        console.log(`${SETTINGS_LOG_PREFIX} Updated keys: ${changedKeys.join(", ")}`);
+    }
+
     // Apply changes
     if (hasLayoutChanges) {
+        console.log(`${SETTINGS_LOG_PREFIX} Applying layout-related CSS updates.`);
         updateCSSLayout();
     }
     if (hasVisualChanges) {
+        console.log(`${SETTINGS_LOG_PREFIX} Applying visual-related CSS updates.`);
         updateCSSColors();
     }
 
     // Update visibility if needed
     if (Object.prototype.hasOwnProperty.call(message, "showSD") && oldSettings.showSD !== message.showSD) {
+        console.log(`${SETTINGS_LOG_PREFIX} Toggling SD visibility to ${settings.showSD ? "visible" : "hidden"}.`);
         updateVisibility();
     }
 };
@@ -110,30 +125,30 @@ export const updateSettings = (message: Partial<Settings>) => {
 // Split CSS updates into layout and colors
 const updateCSSLayout = () => {
     const { barWidth, barHeight, tickWidth, tickHeight, timingWindowHeight, isRounded } = settings;
-
-    // Calculate and set CSS variables
     const windowHeight = window.innerHeight;
     const timingWindowHeightPx = (barHeight * timingWindowHeight) / 100;
-
-    // Only update if the window height has changed significantly (to prevent layout thrashing)
     if (Math.abs(windowHeight - lastWindowHeight) > 1) {
         root.style.setProperty("--window-height", `${windowHeight}px`);
         lastWindowHeight = windowHeight;
     }
-
-    // Only update if the rounded percentage has changed
     const roundedPercent = Math.min(100, Math.max(0, isRounded));
     if (roundedPercent !== lastRoundedPercent) {
         root.style.setProperty("--border-radius", `${roundedPercent}%`);
         lastRoundedPercent = roundedPercent;
     }
-
-    // Set other layout properties
+    const radiusScale = roundedPercent / 100;
+    const barRadiusPx = (barWidth / 2) * radiusScale;
+    const tickRadiusPx = (tickWidth / 2) * radiusScale;
+    const timingWindowRadiusPx = (timingWindowHeightPx / 2) * radiusScale;
+    root.style.setProperty("--bar-radius", `${barRadiusPx}px`);
+    root.style.setProperty("--tick-radius", `${tickRadiusPx}px`);
+    root.style.setProperty("--timing-window-radius", `${timingWindowRadiusPx}px`);
     root.style.setProperty("--bar-width", `${barWidth}px`);
     root.style.setProperty("--bar-height", `${barHeight}px`);
     root.style.setProperty("--tick-width", `${tickWidth}px`);
     root.style.setProperty("--tick-height", `${tickHeight}px`);
     root.style.setProperty("--timing-window-height", `${timingWindowHeightPx}px`);
+    console.log(`${SETTINGS_LOG_PREFIX} Calculated radii (px)`, { barRadiusPx, tickRadiusPx, timingWindowRadiusPx });
 };
 
 const updateCSSColors = () => {
@@ -153,6 +168,7 @@ const updateCSSColors = () => {
 
     // Set color variables
     root.style.setProperty("--color-bar", colorBar);
+    root.style.setProperty("--bar-color", colorBar);
     root.style.setProperty("--color-300g", color300g);
     root.style.setProperty("--color-300", color300);
     root.style.setProperty("--color-200", color200);
@@ -160,9 +176,13 @@ const updateCSSColors = () => {
     root.style.setProperty("--color-50", color50);
     root.style.setProperty("--color-0", color0);
     root.style.setProperty("--color-arrow-early", colorArrowEarly);
+    root.style.setProperty("--arrow-early", colorArrowEarly);
     root.style.setProperty("--color-arrow-late", colorArrowLate);
+    root.style.setProperty("--arrow-late", colorArrowLate);
     root.style.setProperty("--color-arrow-perfect", colorArrowPerfect);
+    root.style.setProperty("--arrow-perfect", colorArrowPerfect);
     root.style.setProperty("--timing-window-opacity", TimingWindowOpacity.toString());
+    root.style.setProperty("--timing-windows-opacity", TimingWindowOpacity.toString());
 };
 
 const updateVisibility = () => {
