@@ -38,8 +38,10 @@ export const cache: cache = {
 // Tosu WebSocket connection
 const DEFAULT_HOST = window.location.host;
 const wsManager = new WebSocketManager(DEFAULT_HOST);
+const SETTINGS_LOG_PREFIX = "[SETTINGS]";
 // Initialize WebSocket connection
 
+console.log(`${SETTINGS_LOG_PREFIX} Requesting settings for path`, window?.COUNTER_PATH);
 wsManager.sendCommand("getSettings", encodeURI(<string>window.COUNTER_PATH));
 wsManager.commands((data: CommandData) => {
     try {
@@ -47,6 +49,7 @@ wsManager.commands((data: CommandData) => {
         console.log("[WEBSOCKET] Received command:", command, "with data:", message);
 
         if (command === "getSettings") {
+            console.log(`${SETTINGS_LOG_PREFIX} Received settings payload`);
             updateSettings(message);
         }
     } catch (error) {
