@@ -46,7 +46,7 @@ export class TickImpl implements Tick {
             });
         }
 
-        this.position = hitError << 1;
+        this.position = (hitError / cache.rate) * 2;
         this.active = true;
         this.timestamp = Date.now();
         this.setClassNames(); // Updates classNames (colors, base class) and calls updateElement
@@ -80,16 +80,16 @@ export class TickImpl implements Tick {
             });
         }
 
-        this.position = hitError << 1;
+        this.position = (hitError / cache.rate) * 2;
         this.timestamp = Date.now();
         this.setClassNames(); // Updates classNames (colors, base class) and calls updateElement
     }
 
     private setClassNames() {
-        const { timingWindows } = cache;
+        const { timingWindows, rate } = cache;
         let newClassNames = "tick"; // Start fresh
 
-        const hitError = Math.abs(this.position >> 1);
+        const hitError = Math.abs(this.position / (rate * 2));
         let matched = false;
 
         for (const [grade, range] of timingWindows) {
@@ -214,7 +214,7 @@ export class TickManager {
         if (processedHits === hitErrors.length) return;
         for (let i = processedHits; i < hitErrors.length; i++) {
             const poolIndex = i % poolSize;
-            const error = hitErrors[i] / rate;
+            const error = hitErrors[i];
             const tick = pool[poolIndex];
 
             // note: processedHits is a constant declaration referencing the value from the previous state
