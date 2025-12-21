@@ -80,7 +80,7 @@ export class TickImpl implements Tick {
             });
         }
 
-        this.position = (hitError / cache.rate) * 2;
+        this.position = hitError * 2;
         this.timestamp = Date.now();
         this.setClassNames(); // Updates classNames (colors, base class) and calls updateElement
     }

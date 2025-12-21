@@ -16,21 +16,35 @@ const getArrowColor = (average: number): string => {
 };
 
 let oldPosition = 0;
+let pendingPosition: number | null = null;
+let rAF: number | null = null;
+
 export const updateArrow = (targetPosition: number): void => {
-    requestAnimationFrame(() => {
-        if (targetPosition === oldPosition) {
-            return;
-        }
-        oldPosition = targetPosition;
-        // console.log(`moved from ${oldPosition} to ${targetPosition}`);
-        if (arrow) {
-            arrow.style.borderTopColor = getArrowColor(targetPosition);
-            arrow.style.transform = `translate3d(${targetPosition * 2}px, 0px, 0px)`;
-        }
-    });
+    pendingPosition = targetPosition;
+
+    if (rAF === null) {
+        rAF = requestAnimationFrame(() => {
+            if (pendingPosition !== null && pendingPosition !== oldPosition) {
+                oldPosition = pendingPosition;
+                if (arrow) {
+                    arrow.style.borderTopColor = getArrowColor(oldPosition);
+                    arrow.style.transform = `translate3d(${oldPosition * 2}px, 0px, 0px)`;
+                }
+            }
+            rAF = null;
+            pendingPosition = null;
+        });
+    }
 };
 
 export function resetArrow() {
+    // Cancel any pending update
+    if (rAF !== null) {
+        cancelAnimationFrame(rAF);
+        rAF = null;
+        pendingPosition = null;
+    }
+
     requestAnimationFrame(() => {
         oldPosition = 0;
         if (arrow) {
