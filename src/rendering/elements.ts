@@ -25,13 +25,6 @@ window.addEventListener("unload", () => {
 export const setHidden = () => getAllElements("div")?.forEach((div) => div.classList.add("hidden"));
 export const setVisible = () => getAllElements("div")?.forEach((div) => div.classList.remove("hidden"));
 
-export const clearSD = (): void => {
-    const sd = getElement(".sd");
-    if (sd) {
-        sd.textContent = "0.00";
-    }
-};
-
 // Update timing window display in the DOM
 export function updateTimingWindowElements() {
     requestAnimationFrame(() => {
@@ -43,8 +36,12 @@ export function updateTimingWindowElements() {
             colorsContainer.innerHTML = "";
         }
 
-        // Set container widths based on miss window (0)
-        const containerWidth = Math.abs(timingWindows.get("0") ?? 0) * 4;
+        // Set container widths based on max window
+        let maxWindow = 0;
+        timingWindows.forEach((width) => {
+            if (width > maxWindow) maxWindow = width;
+        });
+        const containerWidth = Math.abs(maxWindow) * 4;
         document.documentElement.style.setProperty("--container-width", `${containerWidth}px`);
 
         // Helper function to create timing window element

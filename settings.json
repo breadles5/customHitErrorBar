@@ -176,14 +176,6 @@
         "value": 800
     },
     {
-        "uniqueID": "showSD",
-        "type": "checkbox",
-        "title": "Show UR (ms)",
-        "description": "",
-        "options": [],
-        "value": false
-    },
-    {
         "uniqueID": "isRounded",
         "type": "number",
         "title": "Rounded Elements (%)",

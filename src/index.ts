@@ -7,7 +7,12 @@ import { renderTicksOnLoad } from "./rendering/ticks"; // Removed updateTicks
 import { updateArrow } from "./rendering/arrow";
 import { TickManager } from "./calculation/tickManager";
 import { reset } from "./rendering/reset";
-import { median, standardDeviation } from "./calculation/statistics";
+import { median } from "./calculation/statistics";
+
+// useful for debugging in browser
+if (window.self === window.top) {
+    document.body.style.backgroundColor = "black";
+}
 
 window?.addEventListener("load", renderTicksOnLoad);
 
@@ -58,38 +63,41 @@ wsManager.commands((data: CommandData) => {
     }
 });
 
-if (settings.showSD) {
-    const container = getElement("#container");
-    if (container) {
-        const sd = document.createElement("div");
-        sd.classList.add("sd");
-        sd.innerText = "0.00";
-        container.prepend(sd);
-    }
-}
-
 // Handle game state and menu updates
 const apiV2Filters = [
-    "state",
-    { field: "play", keys: ["mode", "mods"] },
-    { field: "beatmap", keys: ["mode", "stats", "time"] },
+    { field: "state", keys: ["name"] },
+    {
+        field: "play",
+        keys: [
+            { field: "mode", keys: ["name"] },
+            { field: "mods", keys: ["name", "rate"] },
+        ],
+    },
+    {
+        field: "beatmap",
+        keys: [
+            { field: "mode", keys: ["name"] },
+            { field: "stats", keys: [{ field: "od", keys: ["original"] }] },
+            { field: "time", keys: ["firstObject"] },
+        ],
+    },
 ];
 wsManager.api_v2((data: WEBSOCKET_V2) => {
     if (cache.state !== data.state.name) {
         cache.state = data.state.name;
 
-        if (cache.state === "play") {
-            const modeChanged: boolean = cache.mode !== data.play.mode.name;
-            const odChanged: boolean = cache.od !== data.beatmap.stats.od.original;
-            const modsChanged: boolean = cache.mods !== data.play.mods.name;
+        const modeChanged: boolean = cache.mode !== data.play.mode.name;
+        const odChanged: boolean = cache.od !== data.beatmap.stats.od.original;
+        const modsChanged: boolean = cache.mods !== data.play.mods.name;
+        cache.rate = data.play.mods.rate;
 
+        if (cache.state === "play") {
             if (modeChanged || odChanged || modsChanged) {
                 cache.mode = data.beatmap.mode.name;
                 cache.od = data.beatmap.stats.od.original;
                 cache.mods = data.play.mods.name;
             }
 
-            cache.rate = data.play.mods.rate;
             cache.firstObjectTime = data.beatmap.time.firstObject;
             const custom = settings.useCustomTimingWindows ? settings.customTimingWindows : undefined;
             cache.timingWindows = calculateTimingWindows(cache.mode, cache.od, cache.mods, custom);
@@ -108,6 +116,9 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
 
 // Handle hit error updates
 const apiV2PreciseFilter = ["hitErrors", "currentTime"];
+// Reusable buffer to avoid allocations per frame
+const nonFadeOutErrors: number[] = [];
+
 wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
     const { hitErrors, currentTime } = data;
     if (currentTime < cache.firstObjectTime) {
@@ -118,22 +129,15 @@ wsManager.api_v2_precise((data: WEBSOCKET_V2_PRECISE) => {
     } else {
         cache.tickPool.update(hitErrors);
 
-        const nonFadeOutErrors: number[] = [];
+        // Clear buffer without allocation
+        nonFadeOutErrors.length = 0;
+
         for (const idx of cache.tickPool.nonFadeOutTicks) {
             nonFadeOutErrors.push(cache.tickPool.pool[idx].position >> 1);
         }
 
         const medianError = median(nonFadeOutErrors);
         updateArrow(medianError);
-        if (settings.showSD) {
-            requestAnimationFrame(() => {
-                const standardDeviationError = standardDeviation(nonFadeOutErrors);
-                const sdElement = getElement(".sd");
-                if (sdElement) {
-                    sdElement.innerText = standardDeviationError.toFixed(2);
-                }
-            });
-        }
         if (cache.isReset) {
             cache.isReset = false;
         }
