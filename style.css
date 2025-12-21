@@ -61,16 +61,7 @@ body {
     height: var(--bar-height);
     justify-self: center;
 }
-.sd {
-    text-align: center;
-    font: 2.5rem "Helvetica", sans-serif, bold;
-    color: #ffffff;
-    transition: linear 200ms;
-    width: var(--container-width);
-    justify-self: center;
-    transition: opacity 200ms linear;
-    opacity: 0.8;
-}
+
 
 /*arrow*/
 .arrow-container {
