@@ -63,8 +63,6 @@ wsManager.commands((data: CommandData) => {
     }
 });
 
-
-
 // Handle game state and menu updates
 const apiV2Filters = [
     { field: "state", keys: ["name"] },
@@ -94,7 +92,6 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
         cache.rate = data.play.mods.rate;
 
         if (cache.state === "play") {
-
             if (modeChanged || odChanged || modsChanged) {
                 cache.mode = data.beatmap.mode.name;
                 cache.od = data.beatmap.stats.od.original;

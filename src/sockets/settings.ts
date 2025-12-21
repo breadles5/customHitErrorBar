@@ -61,7 +61,7 @@ export const settings: Settings = {
     customTimingWindows: "16.5,64,97,127,151",
 };
 // define root element
-const root = typeof document !== "undefined" ? document.documentElement : { style: { setProperty: () => { } } };
+const root = typeof document !== "undefined" ? document.documentElement : { style: { setProperty: () => {} } };
 
 // Cache calculated values
 let lastWindowHeight = 0;

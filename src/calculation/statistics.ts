@@ -3,8 +3,6 @@ export const average = (arr: number[]): number => {
     return arr.reduce((a, b) => a + b, 0) / arr.length;
 };
 
-
-
 // Reusable buffer for median calculation to avoid allocations
 let medianBuffer: number[] = new Array(200); // Start with a reasonable size
 
@@ -44,5 +42,3 @@ export const median = (arr: number[]): number => {
     }
     return medianBuffer[middle];
 };
-
-
