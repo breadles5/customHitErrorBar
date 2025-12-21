@@ -23,7 +23,7 @@ export interface Settings {
     color100: string;
     color50: string;
     color0: string;
-    showSD: boolean;
+
     useCustomTimingWindows: boolean;
     customTimingWindows: string;
 }
@@ -56,12 +56,12 @@ export const settings: Settings = {
     color100: "transparent",
     color50: "transparent",
     color0: "transparent",
-    showSD: false,
+
     useCustomTimingWindows: false,
     customTimingWindows: "16.5,64,97,127,151",
 };
 // define root element
-const root = typeof document !== "undefined" ? document.documentElement : { style: { setProperty: () => {} } };
+const root = typeof document !== "undefined" ? document.documentElement : { style: { setProperty: () => { } } };
 
 // Cache calculated values
 let lastWindowHeight = 0;
@@ -93,7 +93,7 @@ export const updateSettings = (message: Partial<Settings>) => {
             // Track what kind of changes occurred
             if (key.startsWith("color") || key === "TimingWindowOpacity") {
                 hasVisualChanges = true;
-            } else if (key !== "showSD") {
+            } else {
                 hasLayoutChanges = true;
             }
         }
@@ -115,10 +115,9 @@ export const updateSettings = (message: Partial<Settings>) => {
         updateCSSColors();
     }
 
-    // Update visibility if needed
-    if (Object.prototype.hasOwnProperty.call(message, "showSD") && oldSettings.showSD !== message.showSD) {
-        console.log(`${SETTINGS_LOG_PREFIX} Toggling SD visibility to ${settings.showSD ? "visible" : "hidden"}.`);
-        updateVisibility();
+    if (hasVisualChanges) {
+        console.log(`${SETTINGS_LOG_PREFIX} Applying visual-related CSS updates.`);
+        updateCSSColors();
     }
 };
 
@@ -185,16 +184,11 @@ const updateCSSColors = () => {
     root.style.setProperty("--timing-windows-opacity", TimingWindowOpacity.toString());
 };
 
-const updateVisibility = () => {
-    const sdElement = getElement(".sd");
-    if (sdElement) {
-        sdElement.style.display = settings.showSD ? "block" : "none";
-    }
-};
-
 // Update CSS variables
 export const updateCSSVariables = () => {
     updateCSSLayout();
     updateCSSColors();
-    updateVisibility();
 };
+
+updateCSSLayout();
+updateCSSColors();
