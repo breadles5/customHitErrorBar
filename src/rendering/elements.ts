@@ -25,13 +25,6 @@ window.addEventListener("unload", () => {
 export const setHidden = () => getAllElements("div")?.forEach((div) => div.classList.add("hidden"));
 export const setVisible = () => getAllElements("div")?.forEach((div) => div.classList.remove("hidden"));
 
-export const clearSD = (): void => {
-    const sd = getElement(".sd");
-    if (sd) {
-        sd.textContent = "0.00";
-    }
-};
-
 // Update timing window display in the DOM
 export function updateTimingWindowElements() {
     requestAnimationFrame(() => {
