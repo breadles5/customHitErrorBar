@@ -9,6 +9,11 @@ import { TickManager } from "./calculation/tickManager";
 import { reset } from "./rendering/reset";
 import { median } from "./calculation/statistics";
 
+// useful for debugging in browser
+if (window.self === window.top) {
+    document.body.style.backgroundColor = "black";
+}
+
 window?.addEventListener("load", renderTicksOnLoad);
 
 interface cache {
