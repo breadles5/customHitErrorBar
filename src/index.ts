@@ -67,9 +67,22 @@ wsManager.commands((data: CommandData) => {
 
 // Handle game state and menu updates
 const apiV2Filters = [
-    "state",
-    { field: "play", keys: ["mode", "mods"] },
-    { field: "beatmap", keys: ["mode", "stats", "time"] },
+    { field: "state", keys: ["name"] },
+    {
+        field: "play",
+        keys: [
+            { field: "mode", keys: ["name"] },
+            { field: "mods", keys: ["name", "rate"] },
+        ],
+    },
+    {
+        field: "beatmap",
+        keys: [
+            { field: "mode", keys: ["name"] },
+            { field: "stats", keys: [{ field: "od", keys: ["original"] }] },
+            { field: "time", keys: ["firstObject"] },
+        ],
+    },
 ];
 wsManager.api_v2((data: WEBSOCKET_V2) => {
     if (cache.state !== data.state.name) {
@@ -81,8 +94,6 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
         cache.rate = data.play.mods.rate;
 
         if (cache.state === "play") {
-            console.log("Mods: ", data.play.mods.name);
-            console.log("Rate: ", data.play.mods.rate);
 
             if (modeChanged || odChanged || modsChanged) {
                 cache.mode = data.beatmap.mode.name;
