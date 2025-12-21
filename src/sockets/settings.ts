@@ -146,7 +146,7 @@ const updateCSSLayout = () => {
     root.style.setProperty("--bar-height", `${barHeight}px`);
     root.style.setProperty("--tick-width", `${tickWidth}px`);
     root.style.setProperty("--tick-height", `${tickHeight}px`);
-    root.style.setProperty("--timing-window-height", `${timingWindowHeightPx}px`);
+    root.style.setProperty("--timing-window-height", `${timingWindowHeight}%`);
     console.log(`${SETTINGS_LOG_PREFIX} Calculated radii (px)`, { barRadiusPx, tickRadiusPx, timingWindowRadiusPx });
 };
 
