@@ -5,9 +5,7 @@
     "version": "3.7.0",
     "type": "module",
     "scripts": {
-        "build:prod": "vite build --mode production",
-        "build:dev": "vite build --mode development",
-        "build:ci": "vite build --mode ci",
+        "build": "vite build",
         "format": "biome format ./src --write",
         "lint": "biome lint ./src --write"
     },
