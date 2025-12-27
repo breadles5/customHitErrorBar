@@ -1,3 +1,9 @@
+declare global {
+    interface Window {
+        obsstudio?: any;
+    }
+}
+
 import WebSocketManager from "./sockets/socket";
 import type { CommandData, WEBSOCKET_V2, WEBSOCKET_V2_PRECISE } from "./sockets/types";
 import { settings, updateSettings, getSettings } from "./sockets/settings";
@@ -10,7 +16,7 @@ import { reset } from "./rendering/reset";
 import { median } from "./calculation/statistics";
 
 // useful for debugging in browser
-if (window.self === window.top) {
+if (window.self === window.top && !window.obsstudio) {
     document.body.style.backgroundColor = "black";
 }
 
