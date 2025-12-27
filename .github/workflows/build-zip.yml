@@ -15,34 +15,41 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            # Step 2: Set up Node.js
+            # Step 2: Set up pnpm
+            - name: Set up pnpm
+              uses: pnpm/action-setup@v4
+              with:
+                  version: 9
+
+            # Step 3: Set up Node.js
             - name: Set up Node.js
               uses: actions/setup-node@v4
               with:
-                  node-version: "20" # Adjust to your project's Node.js version
+                  node-version: "20"
+                  cache: "pnpm"
 
-            # Step 3: Install dependencies
+            # Step 4: Install dependencies
             - name: Install dependencies
-              run: npm install
+              run: pnpm install --frozen-lockfile
 
-            # Step 4: Build the project
+            # Step 5: Build the project
             - name: Build the project
-              run: npm run build:dev
+              run: pnpm run build
 
-            # Step 5: Get Project Name
+            # Step 6: Get Project Name
             - name: Get Project Name
               id: get-project-name
               run: |
                   PROJECT_NAME=$(node -p "require('./package.json').name")
                   echo "PROJECT_NAME=$PROJECT_NAME" >> $GITHUB_OUTPUT
 
-            # Step 6: Zip the build directory
+            # Step 7: Zip the build directory
             - name: Zip the build directory
               run: |
-                  zip -r ${{ steps.get-project-name.outputs.PROJECT_NAME }}.zip ./dist/*
+                  cd dist && zip -r ../${{ steps.get-project-name.outputs.PROJECT_NAME }}.zip .
               shell: bash
 
-            # Step 7: Upload the zip file as an artifact
+            # Step 8: Upload the zip file as an artifact
             - name: Upload the artifact
               uses: actions/upload-artifact@v4
               with:
