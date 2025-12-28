@@ -53,28 +53,28 @@ const calculateTaikoWindows = (od: number, mods: string): Map<string, number> =>
     return windows;
 };
 
-const calculateManiaWindows = (od: number, mods: string): Map<string, number> => {
+const calculateManiaWindows = (od: number, mods: string, rate: number): Map<string, number> => {
     const windows = new Map<string, number>();
     if (mods.includes("EZ")) {
         const modifiedOd = od * 0.5;
-        windows.set("300g", 22.5);
-        windows.set("300", 64 - 3 * modifiedOd);
-        windows.set("200", 97 - 3 * modifiedOd);
-        windows.set("100", 127 - 3 * modifiedOd);
-        windows.set("50", 151 - 3 * modifiedOd);
+        windows.set("300g", 22.5 * rate);
+        windows.set("300", (64 - 3 * modifiedOd) * rate);
+        windows.set("200", (97 - 3 * modifiedOd) * rate);
+        windows.set("100", (127 - 3 * modifiedOd) * rate);
+        windows.set("50", (151 - 3 * modifiedOd) * rate);
     } else if (mods.includes("HR")) {
-        const windowMultiplier = 1.4;
-        windows.set("300g", 11.43);
-        windows.set("300", (64 - 3 * od) / windowMultiplier);
-        windows.set("200", (97 - 3 * od) / windowMultiplier);
-        windows.set("100", (127 - 3 * od) / windowMultiplier);
-        windows.set("50", (151 - 3 * od) / windowMultiplier);
+        const hrMultiplier = 5 / 7; // Official multiplier is exactly 5/7 (approx 0.714)
+        windows.set("300g", 11.43 * rate);
+        windows.set("300", (64 - 3 * od) * hrMultiplier * rate);
+        windows.set("200", (97 - 3 * od) * hrMultiplier * rate);
+        windows.set("100", (127 - 3 * od) * hrMultiplier * rate);
+        windows.set("50", (151 - 3 * od) * hrMultiplier * rate);
     } else {
-        windows.set("300g", 16.5);
-        windows.set("300", 64 - 3 * od);
-        windows.set("200", 97 - 3 * od);
-        windows.set("100", 127 - 3 * od);
-        windows.set("50", 151 - 3 * od);
+        windows.set("300g", 16.5 * rate);
+        windows.set("300", (64 - 3 * od) * rate);
+        windows.set("200", (97 - 3 * od) * rate);
+        windows.set("100", (127 - 3 * od) * rate);
+        windows.set("50", (151 - 3 * od) * rate);
     }
     return windows;
 };
@@ -83,6 +83,7 @@ export const calculateTimingWindows = (
     gamemode: string,
     od: number,
     mods: string,
+    rate: number,
     customTimingWindows?: string,
 ): Map<string, number> => {
     if (customTimingWindows) {
@@ -116,7 +117,7 @@ export const calculateTimingWindows = (
         case "taiko":
             return calculateTaikoWindows(od, mods);
         case "mania":
-            return calculateManiaWindows(od, mods);
+            return calculateManiaWindows(od, mods, rate);
         default:
             console.warn("no gamemode detected, returning no windows");
             return new Map<string, number>();

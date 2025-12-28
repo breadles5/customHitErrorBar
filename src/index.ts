@@ -106,7 +106,7 @@ wsManager.api_v2((data: WEBSOCKET_V2) => {
 
             cache.firstObjectTime = data.beatmap.time.firstObject;
             const custom = settings.useCustomTimingWindows ? settings.customTimingWindows : undefined;
-            cache.timingWindows = calculateTimingWindows(cache.mode, cache.od, cache.mods, custom);
+            cache.timingWindows = calculateTimingWindows(cache.mode, cache.od, cache.mods, cache.rate, custom);
             updateTimingWindowElements();
             setVisible();
             cache.isReset = false;

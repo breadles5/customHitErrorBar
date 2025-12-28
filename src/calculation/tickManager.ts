@@ -86,7 +86,7 @@ export class TickImpl implements Tick {
     }
 
     private setClassNames() {
-        const { timingWindows, rate } = cache;
+        const { timingWindows } = cache;
         let newClassNames = "tick"; // Start fresh
 
         const hitError = Math.abs(this.position / 2);
@@ -179,7 +179,7 @@ export class TickManager {
         const now = Date.now();
         const { tickDuration, fadeOutDuration } = settings;
         const timeoutThreshold = tickDuration + fadeOutDuration;
-        const { rate } = cache;
+
 
         // cache class properties here
         const poolSize = this.poolSize;
@@ -214,7 +214,7 @@ export class TickManager {
         if (processedHits === hitErrors.length) return;
         for (let i = processedHits; i < hitErrors.length; i++) {
             const poolIndex = i % poolSize;
-            const error = hitErrors[i] / rate;
+            const error = hitErrors[i];
             const tick = pool[poolIndex];
 
             // note: processedHits is a constant declaration referencing the value from the previous state
