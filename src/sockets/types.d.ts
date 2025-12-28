@@ -60,55 +60,55 @@ export interface WEBSOCKET_V2 {
     server: string;
     state: {
         number:
-            | 0
-            | 1
-            | 2
-            | 3
-            | 4
-            | 5
-            | 6
-            | 7
-            | 8
-            | 9
-            | 10
-            | 11
-            | 12
-            | 13
-            | 14
-            | 15
-            | 16
-            | 17
-            | 18
-            | 19
-            | 20
-            | 21
-            | 22
-            | 23;
+        | 0
+        | 1
+        | 2
+        | 3
+        | 4
+        | 5
+        | 6
+        | 7
+        | 8
+        | 9
+        | 10
+        | 11
+        | 12
+        | 13
+        | 14
+        | 15
+        | 16
+        | 17
+        | 18
+        | 19
+        | 20
+        | 21
+        | 22
+        | 23;
         name:
-            | "menu"
-            | "edit"
-            | "play"
-            | "exit"
-            | "selectEdit"
-            | "selectPlay"
-            | "selectDrawings"
-            | "resultScreen"
-            | "update"
-            | "busy"
-            | "unknown"
-            | "lobby"
-            | "matchSetup"
-            | "selectMulti"
-            | "rankingVs"
-            | "onlineSelection"
-            | "optionsOffsetWizard"
-            | "rankingTagCoop"
-            | "rankingTeam"
-            | "beatmapImport"
-            | "packageUpdater"
-            | "benchmark"
-            | "tourney"
-            | "charts";
+        | "menu"
+        | "edit"
+        | "play"
+        | "exit"
+        | "selectEdit"
+        | "selectPlay"
+        | "selectDrawings"
+        | "resultScreen"
+        | "update"
+        | "busy"
+        | "unknown"
+        | "lobby"
+        | "matchSetup"
+        | "selectMulti"
+        | "rankingVs"
+        | "onlineSelection"
+        | "optionsOffsetWizard"
+        | "rankingTagCoop"
+        | "rankingTeam"
+        | "beatmapImport"
+        | "packageUpdater"
+        | "benchmark"
+        | "tourney"
+        | "charts";
     };
     session: {
         playTime: number;
@@ -174,24 +174,24 @@ export interface WEBSOCKET_V2 {
         group: {
             number: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19;
             name:
-                | "none"
-                | "artist"
-                | "bPM"
-                | "creator"
-                | "date"
-                | "difficulty"
-                | "length"
-                | "rank"
-                | "myMaps"
-                | "search"
-                | "show_All"
-                | "title"
-                | "lastPlayed"
-                | "onlineFavourites"
-                | "maniaKeys"
-                | "mode"
-                | "collection"
-                | "rankedStatus";
+            | "none"
+            | "artist"
+            | "bPM"
+            | "creator"
+            | "date"
+            | "difficulty"
+            | "length"
+            | "rank"
+            | "myMaps"
+            | "search"
+            | "show_All"
+            | "title"
+            | "lastPlayed"
+            | "onlineFavourites"
+            | "maniaKeys"
+            | "mode"
+            | "collection"
+            | "rankedStatus";
         };
         skin: {
             useDefaultSkinInEditor: boolean;
@@ -249,20 +249,20 @@ export interface WEBSOCKET_V2 {
         banchoStatus: {
             number: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
             name:
-                | "idle"
-                | "afk"
-                | "playing"
-                | "editing"
-                | "modding"
-                | "multiplayer"
-                | "watching"
-                | "unknown"
-                | "testing"
-                | "submitting"
-                | "paused"
-                | "lobby"
-                | "multiplaying"
-                | "osuDirect";
+            | "idle"
+            | "afk"
+            | "playing"
+            | "editing"
+            | "modding"
+            | "multiplayer"
+            | "watching"
+            | "unknown"
+            | "testing"
+            | "submitting"
+            | "paused"
+            | "lobby"
+            | "multiplaying"
+            | "osuDirect";
         };
         id: number;
         name: string;
@@ -368,6 +368,10 @@ export interface WEBSOCKET_V2 {
         hits: {
             geki: number;
             katu: number;
+            300: number;
+            100: number;
+            50: number;
+            0: number;
             sliderBreaks: number;
             sliderEndHits: number;
             sliderTickHits: number;
@@ -450,15 +454,15 @@ export interface WEBSOCKET_V2 {
         graph: {
             series: {
                 name:
-                    | "aim"
-                    | "aimNoSliders"
-                    | "flashlight"
-                    | "speed"
-                    | "color"
-                    | "rhythm"
-                    | "stamina"
-                    | "movement"
-                    | "strains";
+                | "aim"
+                | "aimNoSliders"
+                | "flashlight"
+                | "speed"
+                | "color"
+                | "rhythm"
+                | "stamina"
+                | "movement"
+                | "strains";
                 data: number[];
             };
             xaxis: number[];
