@@ -24,7 +24,7 @@ const calculateTaikoWindows = (od: number, mods: string): Map<string, number> =>
         const modifiedOd = od / 2;
         windows.set("300", 50 - 3 * modifiedOd);
         if (od >= 5) {
-            windows.set("100", 120 - 8 * modifiedOd);
+            windows.set("100", 119.5 - 8 * modifiedOd);
             windows.set("50", 135 - 8 * modifiedOd);
         } else {
             windows.set("100", 110 - 6 * modifiedOd);
@@ -34,7 +34,7 @@ const calculateTaikoWindows = (od: number, mods: string): Map<string, number> =>
         const modifiedOd = Math.min(od * 1.4, 10);
         windows.set("300", 50 - 3 * modifiedOd);
         if (modifiedOd >= 5) {
-            windows.set("100", 120 - 8 * modifiedOd);
+            windows.set("100", 119.5 - 8 * modifiedOd);
             windows.set("50", 135 - 8 * modifiedOd);
         } else {
             windows.set("100", 110 - 6 * modifiedOd);
@@ -43,7 +43,7 @@ const calculateTaikoWindows = (od: number, mods: string): Map<string, number> =>
     } else {
         windows.set("300", 50 - 3 * od);
         if (od >= 5) {
-            windows.set("100", 120 - 8 * od);
+            windows.set("100", 119.5 - 8 * od);
             windows.set("50", 135 - 8 * od);
         } else {
             windows.set("100", 110 - 6 * od);
